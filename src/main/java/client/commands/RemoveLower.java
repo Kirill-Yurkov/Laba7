@@ -5,8 +5,8 @@ import client.Client;
 import commons.exceptions.CommandCollectionZeroException;
 import commons.exceptions.StopCreateTicketExceptionByClient;
 import commons.patternclass.Ticket;
+import commons.requests.RequestOfCommand;
 import commons.utilities.CommandValues;
-import commons.utilities.Request;
 
 import java.util.ArrayList;
 
@@ -52,12 +52,12 @@ public class RemoveLower implements Command {
     }
 
     @Override
-    public Request makeRequest(String value) throws CommandCollectionZeroException {
+    public RequestOfCommand makeRequest(String value) throws CommandCollectionZeroException {
         try {
            Ticket ticket = client.getTicketCreator().createTicketGroup();
             ArrayList<Object> params = new ArrayList<>();
             params.add(ticket);
-            return new Request(getName(), getValue(), params);
+            return new RequestOfCommand(getName(), getValue(), params);
         } catch (StopCreateTicketExceptionByClient e) {
             return null;
         }

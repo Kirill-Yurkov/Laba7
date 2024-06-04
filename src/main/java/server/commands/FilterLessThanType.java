@@ -1,7 +1,7 @@
 package server.commands;
 
 import commons.exceptions.BadRequestException;
-import commons.utilities.Response;
+import commons.respones.ResponseOfCommand;
 import server.Server;
 import server.commands.interfaces.Command;
 import commons.exceptions.CommandCollectionZeroException;
@@ -42,7 +42,7 @@ public class FilterLessThanType implements Command {
     }
 
     @Override
-    public Response makeResponse(ArrayList<Object> params) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
+    public ResponseOfCommand makeResponse(ArrayList<Object> params, int userId) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
         if(params.get(0) instanceof TicketType){
             TicketType type = (TicketType) params.get(0);
             StringBuilder str = new StringBuilder();
@@ -54,7 +54,7 @@ public class FilterLessThanType implements Command {
                     str.append(ticket).append("\n");
                 }
             }
-            return new Response(getName(), String.valueOf(str));
+            return new ResponseOfCommand(getName(), String.valueOf(str));
         }
         throw new BadRequestException("need a TicketType");
 

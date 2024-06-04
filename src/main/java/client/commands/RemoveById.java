@@ -4,8 +4,8 @@ import client.commands.interfaces.Command;
 import client.Client;
 import commons.exceptions.CommandCollectionZeroException;
 import commons.exceptions.CommandValueException;
+import commons.requests.RequestOfCommand;
 import commons.utilities.CommandValues;
-import commons.utilities.Request;
 
 import java.util.ArrayList;
 
@@ -47,7 +47,7 @@ public class RemoveById implements Command {
     }
 
     @Override
-    public Request makeRequest(String value) throws CommandValueException, CommandCollectionZeroException {
+    public RequestOfCommand makeRequest(String value) throws CommandValueException, CommandCollectionZeroException {
         long id;
         try {
             id = Long.parseLong(value);
@@ -56,7 +56,7 @@ public class RemoveById implements Command {
         }
         ArrayList<Object> params = new ArrayList<>();
         params.add(id);
-        return new Request(getName(), getValue(), params);
+        return new RequestOfCommand(getName(), getValue(), params);
     }
 
     @Override

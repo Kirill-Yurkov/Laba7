@@ -5,8 +5,8 @@ import client.Client;
 import commons.exceptions.CommandCollectionZeroException;
 import commons.exceptions.CommandValueException;
 import commons.patternclass.TicketType;
+import commons.requests.RequestOfCommand;
 import commons.utilities.CommandValues;
-import commons.utilities.Request;
 
 import java.util.ArrayList;
 
@@ -40,7 +40,7 @@ public class FilterLessThanType implements Command {
     }
 
     @Override
-    public Request makeRequest(String value) throws CommandValueException, CommandCollectionZeroException {
+    public RequestOfCommand makeRequest(String value) throws CommandValueException, CommandCollectionZeroException {
         TicketType type;
         try {
             type = TicketType.valueOf(value);
@@ -49,7 +49,7 @@ public class FilterLessThanType implements Command {
         }
         ArrayList<Object> params = new ArrayList<>();
         params.add(type);
-        return new Request(getName(), getValue(), params);
+        return new RequestOfCommand(getName(), getValue(), params);
     }
 
     @Override

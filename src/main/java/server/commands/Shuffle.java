@@ -2,7 +2,7 @@ package server.commands;
 
 import commons.exceptions.BadRequestException;
 import commons.exceptions.CommandValueException;
-import commons.utilities.Response;
+import commons.respones.ResponseOfCommand;
 import server.Server;
 import server.commands.interfaces.Command;
 import commons.exceptions.CommandCollectionZeroException;
@@ -43,12 +43,12 @@ public class Shuffle implements Command {
     }
 
     @Override
-    public Response makeResponse(ArrayList<Object> params) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
+    public ResponseOfCommand makeResponse(ArrayList<Object> params, int userId) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
         if(server.getListManager().getTicketList().isEmpty()){
             throw new CommandCollectionZeroException("collection is zero");
         }
         Collections.shuffle(server.getListManager().getTicketList());
-        return new Response(getName(),"successfully shuffled");
+        return new ResponseOfCommand(getName(),"successfully shuffled");
     }
 
 

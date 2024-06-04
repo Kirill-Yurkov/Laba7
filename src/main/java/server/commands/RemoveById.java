@@ -1,7 +1,7 @@
 package server.commands;
 
 import commons.exceptions.BadRequestException;
-import commons.utilities.Response;
+import commons.respones.ResponseOfCommand;
 import server.Server;
 import server.commands.interfaces.Command;
 import commons.exceptions.CommandCollectionZeroException;
@@ -49,7 +49,7 @@ public class RemoveById implements Command {
     }
 
     @Override
-    public Response makeResponse(ArrayList<Object> params) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
+    public ResponseOfCommand makeResponse(ArrayList<Object> params, int userId) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
         if(params.get(0) instanceof Long){
             if(server.getListManager().getTicketList().isEmpty()){
                 throw new CommandCollectionZeroException("collection is empty");
@@ -58,7 +58,7 @@ public class RemoveById implements Command {
             for(Ticket ticket: server.getListManager().getTicketList()){
                 if(ticket.getId() == id){
                     server.getListManager().remove(ticket);
-                    return new Response(getName(), "successfully");
+                    return new ResponseOfCommand(getName(), "successfully");
                 }
             }
             throw new CommandValueException("id not find");

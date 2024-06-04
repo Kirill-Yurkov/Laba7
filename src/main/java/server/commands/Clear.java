@@ -2,7 +2,7 @@ package server.commands;
 
 import commons.exceptions.BadRequestException;
 import commons.exceptions.CommandValueException;
-import commons.utilities.Response;
+import commons.respones.ResponseOfCommand;
 import server.Server;
 import server.commands.interfaces.Command;
 import commons.exceptions.CommandCollectionZeroException;
@@ -44,13 +44,13 @@ public class Clear implements Command {
     }
 
     @Override
-    public Response makeResponse(ArrayList<Object> params) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
+    public ResponseOfCommand makeResponse(ArrayList<Object> params, int userId) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
         List<Ticket> tickets = new ArrayList<>();
         if (server.getListManager().getTicketList().isEmpty()) {
             throw new CommandCollectionZeroException("collection is empty");
         }
         server.getListManager().setTicketList(tickets);
-        return new Response(getName(), "successfully cleaned");
+        return new ResponseOfCommand(getName(), "successfully cleaned");
     }
 
 

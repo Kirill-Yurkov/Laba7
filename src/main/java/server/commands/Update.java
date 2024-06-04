@@ -1,12 +1,11 @@
 package server.commands;
 
 import commons.exceptions.BadRequestException;
-import commons.utilities.Response;
+import commons.respones.ResponseOfCommand;
 import server.Server;
 import server.commands.interfaces.Command;
 import commons.exceptions.CommandCollectionZeroException;
 import commons.exceptions.CommandValueException;
-import commons.exceptions.StopCreateTicketExceptionByClient;
 import commons.patternclass.Ticket;
 import commons.utilities.CommandValues;
 
@@ -39,7 +38,7 @@ public class Update implements Command {
     }
 
     @Override
-    public Response makeResponse(ArrayList<Object> params) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
+    public ResponseOfCommand makeResponse(ArrayList<Object> params, int userId) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
         if((params.get(0) instanceof Ticket && params.get(1) instanceof Long)||(params.get(1) instanceof Ticket && params.get(0) instanceof Long)){
             if(params.get(0) instanceof Ticket){
                 long id = (long) params.get(1);
@@ -55,7 +54,7 @@ public class Update implements Command {
                             newTicket.getEvent().setId(server.getIdCounter().getIdForEvent(newTicket.getEvent()));
                         }
                         server.getListManager().add(newTicket);
-                        return new Response(getName(), "successfully");
+                        return new ResponseOfCommand(getName(), "successfully");
                     }
                 }
                 throw new CommandValueException("id not find");
@@ -73,7 +72,7 @@ public class Update implements Command {
                             newTicket.getEvent().setId(server.getIdCounter().getIdForEvent(newTicket.getEvent()));
                         }
                         server.getListManager().add(newTicket);
-                        return new Response(getName(), "successfully");
+                        return new ResponseOfCommand(getName(), "successfully");
                     }
                 }
                 throw new CommandValueException("id not find");

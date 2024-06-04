@@ -2,13 +2,12 @@ package server.commands;
 
 import commons.exceptions.BadRequestException;
 import commons.exceptions.CommandCollectionZeroException;
-import commons.utilities.Response;
+import commons.respones.ResponseOfCommand;
 import server.Server;
 import server.commands.interfaces.Command;
 import commons.exceptions.CommandValueException;
 import commons.utilities.CommandValues;
 
-import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -52,8 +51,8 @@ public class ExecuteScript implements Command {
     }
 
     @Override
-    public Response makeResponse(ArrayList<Object> params) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
-        return new Response(getName(), null);
+    public ResponseOfCommand makeResponse(ArrayList<Object> params, int userId) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
+        return new ResponseOfCommand(getName(), null);
     }
     @Override
     public String getName() {

@@ -8,26 +8,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * The ListManager class is responsible for managing the ticket list in the server.
- * It provides functionality for setting the ticket list, adding and removing tickets,
- * and reading the ticket list from the file. The ListManager class is used by the Server class
- * to handle operations related to the ticket list.
- * <p>
- * Usage:
- * ListManager listManager = new ListManager(server);
- * listManager.setTicketList(tickets); // Set the ticket list
- * listManager.add(ticket); // Add a ticket to the list
- * listManager.remove(ticket); // Remove a ticket from the list
- * listManager.readTicketList(); // Read the ticket list from the file
- * <p>
- * Example:
- * ListManager listManager = new ListManager(server);
- * listManager.setTicketList(tickets);
- * listManager.add(ticket);
- * listManager.remove(ticket);
- * listManager.readTicketList();
- */
 @Getter
 public class ListManager {
     private List<Ticket> ticketList = new ArrayList<>();
@@ -54,7 +34,7 @@ public class ListManager {
     }
 
     public void readTicketList() {
-        ticketList = server.getReaderWriter().getCollectionTicket();
+        ticketList = server.getDBManager().getCollectionTicket();
         initializeCollection();
     }
 

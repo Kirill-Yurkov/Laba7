@@ -1,20 +1,29 @@
 package server.managers;
 
+import commons.exceptions.AuthException;
 import commons.exceptions.BadResponseException;
-import commons.utilities.ResponseOfException;
+import commons.requests.RequestAuth;
+import commons.requests.RequestOfCommand;
+import commons.respones.ResponseOfCommand;
+import commons.respones.ResponseOfException;
 import commons.exceptions.ServerMainResponseException;
-import commons.utilities.Request;
-import commons.utilities.Response;
 import server.Server;
 
 import java.io.*;
 import java.net.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
 import java.util.logging.*;
 
 public class TCPServer {
     private static final int PORT = 7777;
     public static final Logger LOGGER = Logger.getLogger(TCPServer.class.getName());
     private Server server;
+
+    private final ExecutorService requestPool = Executors.newFixedThreadPool(10);
+    private final ForkJoinPool processingPool = new ForkJoinPool();
+
     static {
         try {
             LogManager.getLogManager().reset();
@@ -40,7 +49,7 @@ public class TCPServer {
                 try {
                     Socket clientSocket = serverSocket.accept();
                     LOGGER.info("Клиент подключился: " + clientSocket.getInetAddress());
-                    new ClientHandler(clientSocket, server).start();
+                    requestPool.submit(new ClientHandler(clientSocket, server, processingPool));
                 } catch (IOException e) {
                     LOGGER.log(Level.SEVERE, "Ошибка при подключении клиента: " + e.getMessage(), e);
                 }
@@ -51,12 +60,15 @@ public class TCPServer {
     }
 }
 
-class ClientHandler extends Thread {
+class ClientHandler implements Runnable {
     private Socket clientSocket;
     private Server server;
-    public ClientHandler(Socket socket, Server server) {
+    private ForkJoinPool processingPool;
+
+    public ClientHandler(Socket socket, Server server, ForkJoinPool processingPool) {
         this.clientSocket = socket;
         this.server = server;
+        this.processingPool = processingPool;
     }
 
     @Override
@@ -64,25 +76,38 @@ class ClientHandler extends Thread {
         try (ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
              ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream())) {
 
-            for (; ; ) {
+            while (true) {
                 try {
                     Object inputObject = in.readObject();
-                    if (inputObject instanceof Request) {
-                        Request request = (Request) inputObject;
-                        try {
-                            Response response = server.invoke(request);
-                            out.writeObject(response);
-                            TCPServer.LOGGER.info("Выполнена команда: " + response.getName() + " от клиента " + clientSocket);
-                        } catch (ServerMainResponseException e){
-                            ResponseOfException responseOfException = new ResponseOfException(request.getName(), e);
-                            out.writeObject(responseOfException);
-                            TCPServer.LOGGER.info("Выполнена команда: " + responseOfException.getName() + " от клиента " + clientSocket);
-                        }
-                        out.flush();
-                    } else {
-                        System.out.println(inputObject);
-                        out.writeObject(new ResponseOfException("WRONG", new BadResponseException("Неверный запрос")));
-                        TCPServer.LOGGER.warning("Получен неверный объект от клиента " + clientSocket);
+                    if (inputObject instanceof RequestOfCommand) {
+                        RequestOfCommand requestOfCommand = (RequestOfCommand) inputObject;
+                        processingPool.submit(() -> {
+                            try {
+                                Integer id = server.getDBManager().checkAuth(requestOfCommand.getLogin(), requestOfCommand.getPassword());
+                                ResponseOfCommand responseOfCommand = server.invoke(requestOfCommand, id);
+                                TCPServer.LOGGER.info("Выполнена команда: " + responseOfCommand.getName() + " от клиента " + clientSocket);
+                                sendResponse(out, responseOfCommand);
+                            } catch (ServerMainResponseException | AuthException e) {
+                                ResponseOfException responseOfException = new ResponseOfException(requestOfCommand.getName(), e);
+                                TCPServer.LOGGER.severe("Ошибка: " + responseOfException.getName() + " для клиента " + clientSocket);
+                                sendResponse(out, responseOfException);
+                            }
+                        });
+                    } else if (inputObject instanceof RequestAuth) {
+                        RequestAuth requestAuth = (RequestAuth) inputObject;
+                        processingPool.submit(() ->{
+                            try {
+                                Integer id = server.getDBManager().checkAuth(requestAuth.getLogin(), requestAuth.getPassword());
+                                sendResponse(out, new ResponseOfCommand(requestAuth.getLogin(), "successfully authorized"));
+                                TCPServer.LOGGER.info(requestAuth.getLogin() + " successfully authorized by id " + id);
+                            } catch (AuthException e){
+                                sendResponse(out, new ResponseOfException(requestAuth.getLogin(), e));
+                                TCPServer.LOGGER.severe("Ошибка: " + requestAuth.getLogin() + " для клиента " + clientSocket);
+                            }
+                        });
+                    } else{
+                        ResponseOfException responseOfException = new ResponseOfException("WRONG", new BadResponseException("Неверный запрос"));
+                        sendResponse(out, responseOfException);
                     }
                 } catch (EOFException | SocketException ignored) {
                     break;
@@ -91,7 +116,6 @@ class ClientHandler extends Thread {
         } catch (IOException | ClassNotFoundException e) {
             TCPServer.LOGGER.log(Level.SEVERE, "Ошибка в обработке клиента: " + e.getMessage(), e);
         } finally {
-            server.getReaderWriter().writeXML(server.getFileManager().getFilePath(), server.getListManager().getTicketList());
             try {
                 clientSocket.close();
             } catch (IOException e) {
@@ -100,5 +124,27 @@ class ClientHandler extends Thread {
             TCPServer.LOGGER.info("Клиент отключился: " + clientSocket.getInetAddress());
         }
     }
-}
 
+    private void sendResponse(ObjectOutputStream out, ResponseOfCommand responseOfCommand) {
+        new Thread(() -> {
+            try {
+                out.writeObject(responseOfCommand);
+                out.flush();
+            } catch (IOException e) {
+                TCPServer.LOGGER.log(Level.SEVERE, "Ошибка при отправке ответа клиенту: " + e.getMessage(), e);
+            }
+        }).start();
+    }
+    private void sendResponse(ObjectOutputStream out, ResponseOfException response) {
+        new Thread(() -> {
+            try {
+                out.writeObject(response);
+                out.flush();
+
+            } catch (IOException e) {
+                TCPServer.LOGGER.log(Level.SEVERE, "Ошибка при отправке ответа клиенту: " + e.getMessage(), e);
+            }
+        }).start();
+    }
+
+}

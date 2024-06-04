@@ -4,7 +4,7 @@ import client.commands.interfaces.Command;
 import client.Client;
 import commons.exceptions.CommandValueException;
 import commons.utilities.CommandValues;
-import commons.utilities.Request;
+import commons.requests.RequestOfCommand;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -50,7 +50,7 @@ public class ExecuteScript implements Command {
     }
 
     @Override
-    public Request makeRequest(String filePath) throws CommandValueException {
+    public RequestOfCommand makeRequest(String filePath) throws CommandValueException {
 
         if (checkFilePermission(filePath)) {
             if(!fileSet.contains(filePath)){
@@ -61,7 +61,7 @@ public class ExecuteScript implements Command {
                 client.setWithFile(false);
                 ArrayList<Object> params = new ArrayList<>();
                 params.add(filePath);
-                return new Request(getName(),getValue(),params);
+                return new RequestOfCommand(getName(),getValue(),params);
             } else {
                 client.setWithFile(false);
                 throw new CommandValueException("file has recursion");

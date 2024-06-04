@@ -168,7 +168,7 @@ public class Validator {
     private static boolean isValidResponseElement(Object value){
         return ((value instanceof Ticket) && (isValidTicket((Ticket) value)) || ((value instanceof client.patternclass.TicketType) && (isValidTicketType(value.toString()))));
     }
-    public static boolean isValidResponse(Response response){
+    public static boolean isValidResponse(ResponseOfCommand response){
         switch (response.getCommandValues()){
             case NOTHING -> {
                 return response.getParams().isEmpty();

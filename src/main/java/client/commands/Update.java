@@ -7,7 +7,7 @@ import commons.exceptions.CommandValueException;
 import commons.exceptions.StopCreateTicketExceptionByClient;
 import commons.patternclass.Ticket;
 import commons.utilities.CommandValues;
-import commons.utilities.Request;
+import commons.requests.RequestOfCommand;
 
 import java.util.ArrayList;
 
@@ -38,14 +38,14 @@ public class Update implements Command {
     }
 
     @Override
-    public Request makeRequest(String value) throws CommandValueException, CommandCollectionZeroException {
+    public RequestOfCommand makeRequest(String value) throws CommandValueException, CommandCollectionZeroException {
         long id;
         try {
             id = Long.parseLong(value);
             Ticket ticket = client.getTicketCreator().createTicketGroup();
             ArrayList<Object> params = new ArrayList<>();
             params.add(ticket);
-            return new Request(getName(), getValue(), params);
+            return new RequestOfCommand(getName(), getValue(), params);
         } catch (NumberFormatException ignored){
             throw new CommandValueException("long");
         } catch (StopCreateTicketExceptionByClient e) {

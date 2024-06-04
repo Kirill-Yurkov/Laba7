@@ -1,12 +1,11 @@
 package server.commands;
 
 import commons.exceptions.BadRequestException;
-import commons.utilities.Response;
+import commons.respones.ResponseOfCommand;
 import server.Server;
 import server.commands.interfaces.Command;
 import commons.exceptions.CommandCollectionZeroException;
 import commons.exceptions.CommandValueException;
-import commons.patternclass.Ticket;
 import commons.utilities.CommandValues;
 
 import java.util.ArrayList;
@@ -38,7 +37,7 @@ public class CountGreaterThanEvent implements Command {
     }
 
     @Override
-    public Response makeResponse(ArrayList<Object> params) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
+    public ResponseOfCommand makeResponse(ArrayList<Object> params, int userId) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
         if(params.get(0) instanceof Integer){
             if (server.getListManager().getTicketList().isEmpty()) {
                 throw new CommandCollectionZeroException("collection is zero");
@@ -47,7 +46,7 @@ public class CountGreaterThanEvent implements Command {
             long count = server.getListManager().getTicketList().stream()
                     .filter(ticket -> ticket.getEvent() != null && ticket.getEvent().getTicketsCount() > value)
                     .count();
-            return new Response(getName(), "Count events greater than " + value + " by ticket count: " + count + "\n");
+            return new ResponseOfCommand(getName(), "Count events greater than " + value + " by ticket count: " + count + "\n");
         }
         throw new BadRequestException("need an Integer");
     }

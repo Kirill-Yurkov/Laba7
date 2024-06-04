@@ -1,12 +1,9 @@
 package server.commands;
 
 import commons.exceptions.BadRequestException;
-import commons.exceptions.CommandCollectionZeroException;
-import commons.exceptions.CommandValueException;
-import commons.utilities.Response;
+import commons.respones.ResponseOfCommand;
 import server.Server;
 import server.commands.interfaces.Command;
-import commons.exceptions.StopCreateTicketExceptionByClient;
 import commons.patternclass.Ticket;
 import commons.utilities.CommandValues;
 
@@ -43,7 +40,7 @@ public class Add implements Command {
     }
 
     @Override
-    public Response makeResponse(ArrayList<Object> params) throws BadRequestException {
+    public ResponseOfCommand makeResponse(ArrayList<Object> params, int userId) throws BadRequestException {
         if(params.get(0) instanceof Ticket){
             Ticket ticket = (Ticket) params.get(0);
             ticket.setId(server.getIdCounter().getIdForTicket(ticket));
@@ -51,7 +48,7 @@ public class Add implements Command {
                 ticket.getEvent().setId(server.getIdCounter().getIdForEvent(ticket.getEvent()));
             }
             server.getListManager().add(ticket);
-            return new Response(getName(), "successfully created");
+            return new ResponseOfCommand(getName(), "successfully created");
         }
         throw new BadRequestException("need a Ticket");
     }

@@ -4,7 +4,7 @@ import client.Client;
 import client.commands.interfaces.Command;
 import commons.exceptions.CommandCollectionZeroException;
 import commons.utilities.CommandValues;
-import commons.utilities.Request;
+import commons.requests.RequestOfCommand;
 
 import java.util.ArrayList;
 
@@ -41,8 +41,8 @@ public class Clear implements Command {
     }
 
     @Override
-    public Request makeRequest(String value) throws CommandCollectionZeroException {
-        return new Request(getName(), getValue(), new ArrayList<>());
+    public RequestOfCommand makeRequest(String value) throws CommandCollectionZeroException {
+        return new RequestOfCommand(getName(), getValue(), new ArrayList<>());
     }
 
     @Override

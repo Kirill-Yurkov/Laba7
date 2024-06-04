@@ -2,7 +2,7 @@ package server.commands;
 
 import commons.exceptions.BadRequestException;
 import commons.exceptions.CommandValueException;
-import commons.utilities.Response;
+import commons.respones.ResponseOfCommand;
 import server.Server;
 import server.commands.interfaces.Command;
 import commons.exceptions.CommandCollectionZeroException;
@@ -43,7 +43,7 @@ public class AverageOfPrice implements Command {
     }
 
     @Override
-    public Response makeResponse(ArrayList<Object> params) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
+    public ResponseOfCommand makeResponse(ArrayList<Object> params, int userId) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
         int price = server.getListManager().getTicketList().stream()
                 .filter(ticket -> ticket.getPrice() != null)
                 .mapToInt(Ticket::getPrice)
@@ -51,7 +51,7 @@ public class AverageOfPrice implements Command {
         if (server.getListManager().getTicketList().isEmpty()) {
             throw new CommandCollectionZeroException("collection is zero");
         } else {
-            return new Response(getName(),String.valueOf(price / server.getListManager().getTicketList().size()));
+            return new ResponseOfCommand(getName(),String.valueOf(price / server.getListManager().getTicketList().size()));
         }
     }
 

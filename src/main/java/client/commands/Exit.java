@@ -2,8 +2,8 @@ package client.commands;
 
 import client.commands.interfaces.Command;
 import client.Client;
+import commons.requests.RequestOfCommand;
 import commons.utilities.CommandValues;
-import commons.utilities.Request;
 
 import java.util.ArrayList;
 
@@ -29,9 +29,9 @@ public class Exit implements Command {
     }
 
     @Override
-    public Request makeRequest(String value){
+    public RequestOfCommand makeRequest(String value){
         client.stop();
-        return new Request(getName(),getValue(), new ArrayList<>());
+        return new RequestOfCommand(getName(),getValue(), new ArrayList<>());
     }
 
     @Override

@@ -48,8 +48,18 @@ public class Client {
     private void initialize(){
         clientOn = true;
         tcpClient.openConnection();
+        String login;
+        String password;
+        do{
+            inputOutput.outPut("Введите логин: \n~");
+            login = inputOutput.inPutConsole();
+            inputOutput.outPut("Введите пароль: \n~");
+            password = inputOutput.inPutConsole();
+        }while (!auth(login, password));
     }
-
+    private boolean auth(String login, String password){
+        tcpClient.getAnswer()
+    }
     public void start() {
         boolean isCommandWas = true;
         initialize();

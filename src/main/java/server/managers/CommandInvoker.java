@@ -2,8 +2,8 @@ package server.managers;
 
 
 import commons.exceptions.BadRequestException;
-import commons.utilities.Request;
-import commons.utilities.Response;
+import commons.requests.RequestOfCommand;
+import commons.respones.ResponseOfCommand;
 import lombok.Getter;
 import server.Server;
 import server.commands.*;
@@ -64,23 +64,23 @@ public class CommandInvoker {
                 new FilterLessThanType());
     }
 
-    public Response invoke(Request request) throws CommandValueException, NullPointerException, CommandCollectionZeroException, BadRequestException {
-        switch (request.getCommandValues()) {
+    public ResponseOfCommand invoke(RequestOfCommand requestOfCommand, int userId) throws CommandValueException, NullPointerException, CommandCollectionZeroException, BadRequestException {
+        switch (requestOfCommand.getCommandValues()) {
             case ELEMENT,VALUE -> {
-                if (request.getParams().size()==1) {
-                    return commands.get(request.getName()).makeResponse(request.getParams());
+                if (requestOfCommand.getParams().size()==1) {
+                    return commands.get(requestOfCommand.getName()).makeResponse(requestOfCommand.getParams(), userId);
                 }
                 throw new CommandValueException("unexpected values");
             }
             case VALUE_ELEMENT -> {
-                if (request.getParams().size() == 2) {
-                    return commands.get(request.getName()).makeResponse(request.getParams());
+                if (requestOfCommand.getParams().size() == 2) {
+                    return commands.get(requestOfCommand.getName()).makeResponse(requestOfCommand.getParams(), userId);
                 }
                 throw new CommandValueException("unexpected values");
             }
             case NOTHING -> {
-                if(request.getParams().isEmpty()){
-                    return commands.get(request.getName()).makeResponse(request.getParams());
+                if(requestOfCommand.getParams().isEmpty()){
+                    return commands.get(requestOfCommand.getName()).makeResponse(requestOfCommand.getParams(), userId);
                 }
                 throw new CommandValueException("unexpected values");
             }

@@ -1,7 +1,7 @@
 package server.commands.interfaces;
 
 import commons.exceptions.BadRequestException;
-import commons.utilities.Response;
+import commons.respones.ResponseOfCommand;
 import server.Server;
 import commons.exceptions.CommandCollectionZeroException;
 import commons.exceptions.CommandValueException;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public interface Command {
     CommandValues getValue();
     void setServer(Server server);
-    Response makeResponse(ArrayList<Object> params) throws CommandValueException, CommandCollectionZeroException, BadRequestException;
+    ResponseOfCommand makeResponse(ArrayList<Object> params, int userId) throws CommandValueException, CommandCollectionZeroException, BadRequestException;
     String getName();
     String description();
 }

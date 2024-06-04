@@ -3,10 +3,9 @@ package server.commands;
 import commons.exceptions.BadRequestException;
 import commons.exceptions.CommandCollectionZeroException;
 import commons.exceptions.CommandValueException;
-import commons.exceptions.StopCreateTicketExceptionByClient;
 import commons.patternclass.Ticket;
+import commons.respones.ResponseOfCommand;
 import commons.utilities.CommandValues;
-import commons.utilities.Response;
 import server.Server;
 import server.commands.interfaces.Command;
 
@@ -39,7 +38,7 @@ public class AddIfMin implements Command {
     }
 
     @Override
-    public Response makeResponse(ArrayList<Object> params) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
+    public ResponseOfCommand makeResponse(ArrayList<Object> params, int uesrId) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
         if (server.getListManager().getTicketList().isEmpty()) {
             throw new CommandCollectionZeroException("collection is zero");
         }
@@ -55,7 +54,7 @@ public class AddIfMin implements Command {
                 if (ticket.getEvent() != null) {
                     ticket.getEvent().setId(server.getIdCounter().getIdForEvent(ticket.getEvent()));
                 }
-                return new Response(getName(), "successfully added");
+                return new ResponseOfCommand(getName(), "successfully added");
             }
             throw new CommandValueException("price more than minimal");
         }

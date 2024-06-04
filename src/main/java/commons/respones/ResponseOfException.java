@@ -1,4 +1,4 @@
-package commons.utilities;
+package commons.respones;
 
 
 import lombok.Getter;
@@ -16,7 +16,7 @@ public class ResponseOfException implements Serializable {
 
     @Override
     public String toString() {
-        return "Response{" +
+        return "ResponseOfCommand{" +
                 "name='" + name + '\'' +
                 ", answer='" + exception + '\'' +
                 '}';

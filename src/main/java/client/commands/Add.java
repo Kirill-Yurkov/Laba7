@@ -4,8 +4,8 @@ import client.Client;
 import client.commands.interfaces.Command;
 import commons.exceptions.StopCreateTicketExceptionByClient;
 import commons.patternclass.Ticket;
+import commons.requests.RequestOfCommand;
 import commons.utilities.CommandValues;
-import commons.utilities.Request;
 
 import java.util.ArrayList;
 
@@ -40,7 +40,7 @@ public class Add implements Command {
     }
 
     @Override
-    public Request makeRequest(String value) {
+    public RequestOfCommand makeRequest(String value) {
         Ticket ticket;
         try {
             if (client.isWithFile()) {
@@ -50,7 +50,7 @@ public class Add implements Command {
             }
             ArrayList<Object> params = new ArrayList<>();
             params.add(ticket);
-            return new Request(getName(), getValue(), params);
+            return new RequestOfCommand(getName(), getValue(), params);
         } catch (StopCreateTicketExceptionByClient e) {
             return null;
         }

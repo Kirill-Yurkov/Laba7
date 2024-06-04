@@ -6,8 +6,8 @@ import client.commands.interfaces.Command;
 import commons.exceptions.BadResponseException;
 import commons.exceptions.CommandCollectionZeroException;
 import commons.exceptions.CommandValueException;
-import commons.utilities.ResponseOfException;
-import commons.utilities.Response;
+import commons.respones.ResponseOfCommand;
+import commons.respones.ResponseOfException;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -58,8 +58,8 @@ public class CommandInvoker {
         }
     }
 
-    public String invokeFromResponse(Response response) {
-        return response.getAnswer();
+    public String invokeFromResponse(ResponseOfCommand responseOfCommand) {
+        return responseOfCommand.getAnswer();
     }
 
     public String invokeFromResponseException(ResponseOfException responseOfException) {

@@ -4,8 +4,8 @@ import client.commands.interfaces.Command;
 import client.Client;
 import commons.exceptions.CommandCollectionZeroException;
 import commons.exceptions.CommandValueException;
+import commons.requests.RequestOfCommand;
 import commons.utilities.CommandValues;
-import commons.utilities.Request;
 
 import java.util.ArrayList;
 
@@ -36,13 +36,13 @@ public class CountGreaterThanEvent implements Command {
     }
 
     @Override
-    public Request makeRequest(String value) throws CommandValueException, CommandCollectionZeroException {
+    public RequestOfCommand makeRequest(String value) throws CommandValueException, CommandCollectionZeroException {
         int ticketsCount;
         try {
             ticketsCount = Integer.parseInt(value);
             ArrayList<Object> params = new ArrayList<>();
             params.add(ticketsCount);
-            return new Request(getName(), getValue(), params);
+            return new RequestOfCommand(getName(), getValue(), params);
         } catch (NumberFormatException ignored) {
             throw new CommandValueException("int");
         }

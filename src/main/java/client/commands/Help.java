@@ -2,9 +2,8 @@ package client.commands;
 
 import client.commands.interfaces.Command;
 import client.Client;
+import commons.requests.RequestOfCommand;
 import commons.utilities.CommandValues;
-import commons.utilities.Request;
-import commons.utilities.Response;
 
 import java.util.ArrayList;
 
@@ -45,13 +44,13 @@ public class Help implements Command {
         this.client = client;
     }
     @Override
-    public Request makeRequest(String value){
+    public RequestOfCommand makeRequest(String value){
         StringBuilder str = new StringBuilder();
         for(Command command: client.getCommandInvoker().getCommands()){
             str.append("\n").append(command.getName()).append(" : ").append(command.description());
         }
         client.getInputOutput().outPut(String.valueOf(str));
-        return new Request(getName(),getValue(), new ArrayList<Object>());
+        return new RequestOfCommand(getName(),getValue(), new ArrayList<Object>());
     }
 
     @Override

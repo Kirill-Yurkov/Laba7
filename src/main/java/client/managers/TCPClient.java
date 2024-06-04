@@ -2,9 +2,9 @@ package client.managers;
 
 import client.Client;
 import commons.exceptions.BadResponseException;
-import commons.utilities.Request;
-import commons.utilities.Response;
-import commons.utilities.ResponseOfException;
+import commons.requests.RequestOfCommand;
+import commons.respones.ResponseOfCommand;
+import commons.respones.ResponseOfException;
 
 import java.io.*;
 import java.net.*;
@@ -76,14 +76,14 @@ public class TCPClient {
         return false;
     }
 
-    public String getAnswer(Request request) throws BadResponseException {
+    public String getAnswer(RequestOfCommand requestOfCommand) throws BadResponseException {
         try {
-            outPort.writeObject(request);
+            outPort.writeObject(requestOfCommand);
             outPort.flush();
             Object response = inPort.readObject();
-            if (response instanceof Response) {
+            if (response instanceof ResponseOfCommand) {
                 LOGGER.info("От сервера: " + response);
-                return client.getCommandInvoker().invokeFromResponse((Response) response);
+                return client.getCommandInvoker().invokeFromResponse((ResponseOfCommand) response);
             } else if (response instanceof ResponseOfException) {
                 LOGGER.info("Ответ от сервре" + response);
                 throw new BadResponseException(client.getCommandInvoker().invokeFromResponseException((ResponseOfException) response));

@@ -3,9 +3,8 @@ package server.commands;
 import commons.exceptions.BadRequestException;
 import commons.exceptions.CommandCollectionZeroException;
 import commons.exceptions.CommandValueException;
-import commons.patternclass.Ticket;
+import commons.respones.ResponseOfCommand;
 import commons.utilities.CommandValues;
-import commons.utilities.Response;
 import server.Server;
 import server.commands.interfaces.Command;
 
@@ -44,7 +43,7 @@ public class Show implements Command {
     }
 
     @Override
-    public Response makeResponse(ArrayList<Object> params) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
+    public ResponseOfCommand makeResponse(ArrayList<Object> params, int userId) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
         StringBuilder str = new StringBuilder();
         if (server.getListManager().getTicketList().isEmpty()) {
             throw new CommandCollectionZeroException("collection is empty");
@@ -56,7 +55,7 @@ public class Show implements Command {
                 str.append(server.getListManager().getTicketList().get(i).toString());
             }
         }
-        return new Response(getName(), String.valueOf(str));
+        return new ResponseOfCommand(getName(), String.valueOf(str));
     }
 
 

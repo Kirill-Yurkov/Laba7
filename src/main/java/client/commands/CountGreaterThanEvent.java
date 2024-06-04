@@ -42,7 +42,7 @@ public class CountGreaterThanEvent implements Command {
             ticketsCount = Integer.parseInt(value);
             ArrayList<Object> params = new ArrayList<>();
             params.add(ticketsCount);
-            return new RequestOfCommand(getName(), getValue(), params);
+            return new RequestOfCommand(getName(), getValue(), params, client.getLogin(), client.getPassword());
         } catch (NumberFormatException ignored) {
             throw new CommandValueException("int");
         }

@@ -50,7 +50,7 @@ public class Help implements Command {
             str.append("\n").append(command.getName()).append(" : ").append(command.description());
         }
         client.getInputOutput().outPut(String.valueOf(str));
-        return new RequestOfCommand(getName(),getValue(), new ArrayList<Object>());
+        return new RequestOfCommand(getName(),getValue(), new ArrayList<Object>(), client.getLogin(), client.getPassword());
     }
 
     @Override

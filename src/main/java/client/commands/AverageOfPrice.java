@@ -41,7 +41,7 @@ public class AverageOfPrice implements Command {
 
     @Override
     public RequestOfCommand makeRequest(String value) throws CommandCollectionZeroException {
-        return new RequestOfCommand(getName(), getValue(), new ArrayList<>());
+        return new RequestOfCommand(getName(), getValue(), new ArrayList<>(), client.getLogin(), client.getPassword());
     }
 
     @Override

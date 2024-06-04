@@ -3,7 +3,7 @@ package server.commands;
 import commons.exceptions.BadRequestException;
 import commons.exceptions.CommandCollectionZeroException;
 import commons.exceptions.CommandValueException;
-import commons.respones.ResponseOfCommand;
+import commons.responses.ResponseOfCommand;
 import server.Server;
 import server.commands.interfaces.Command;
 import commons.utilities.CommandValues;
@@ -33,7 +33,6 @@ public class Exit implements Command {
 
     @Override
     public ResponseOfCommand makeResponse(ArrayList<Object> params, int userId) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
-        server.getReaderWriter().writeXML(server.getDBManager().getFilePath(), server.getListManager().getTicketList());
         return new ResponseOfCommand(getName(), "successfully");
     }
 

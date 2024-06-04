@@ -49,7 +49,7 @@ public class FilterLessThanType implements Command {
         }
         ArrayList<Object> params = new ArrayList<>();
         params.add(type);
-        return new RequestOfCommand(getName(), getValue(), params);
+        return new RequestOfCommand(getName(), getValue(), params, client.getLogin(), client.getPassword());
     }
 
     @Override

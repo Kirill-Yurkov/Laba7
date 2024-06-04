@@ -4,7 +4,7 @@ import lombok.Getter;
 
 import java.io.Serializable;
 @Getter
-public class RequestAuth implements Serializable {
+public class RequestAuth extends Request {
     private String login;
     private String password;
     public RequestAuth(String login, String password){

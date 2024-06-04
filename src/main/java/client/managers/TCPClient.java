@@ -2,9 +2,9 @@ package client.managers;
 
 import client.Client;
 import commons.exceptions.BadResponseException;
-import commons.requests.RequestOfCommand;
-import commons.respones.ResponseOfCommand;
-import commons.respones.ResponseOfException;
+import commons.requests.Request;
+import commons.responses.ResponseOfCommand;
+import commons.responses.ResponseOfException;
 
 import java.io.*;
 import java.net.*;
@@ -76,9 +76,9 @@ public class TCPClient {
         return false;
     }
 
-    public String getAnswer(RequestOfCommand requestOfCommand) throws BadResponseException {
+    public String getAnswer(Request request) throws BadResponseException {
         try {
-            outPort.writeObject(requestOfCommand);
+            outPort.writeObject(request);
             outPort.flush();
             Object response = inPort.readObject();
             if (response instanceof ResponseOfCommand) {

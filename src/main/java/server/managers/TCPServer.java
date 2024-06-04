@@ -4,8 +4,8 @@ import commons.exceptions.AuthException;
 import commons.exceptions.BadResponseException;
 import commons.requests.RequestAuth;
 import commons.requests.RequestOfCommand;
-import commons.respones.ResponseOfCommand;
-import commons.respones.ResponseOfException;
+import commons.responses.ResponseOfCommand;
+import commons.responses.ResponseOfException;
 import commons.exceptions.ServerMainResponseException;
 import server.Server;
 
@@ -79,8 +79,7 @@ class ClientHandler implements Runnable {
             while (true) {
                 try {
                     Object inputObject = in.readObject();
-                    if (inputObject instanceof RequestOfCommand) {
-                        RequestOfCommand requestOfCommand = (RequestOfCommand) inputObject;
+                    if (inputObject instanceof RequestOfCommand requestOfCommand) {
                         processingPool.submit(() -> {
                             try {
                                 Integer id = server.getDBManager().checkAuth(requestOfCommand.getLogin(), requestOfCommand.getPassword());
@@ -93,8 +92,7 @@ class ClientHandler implements Runnable {
                                 sendResponse(out, responseOfException);
                             }
                         });
-                    } else if (inputObject instanceof RequestAuth) {
-                        RequestAuth requestAuth = (RequestAuth) inputObject;
+                    } else if (inputObject instanceof RequestAuth requestAuth) {
                         processingPool.submit(() ->{
                             try {
                                 Integer id = server.getDBManager().checkAuth(requestAuth.getLogin(), requestAuth.getPassword());

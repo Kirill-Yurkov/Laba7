@@ -45,7 +45,7 @@ public class Update implements Command {
             Ticket ticket = client.getTicketCreator().createTicketGroup();
             ArrayList<Object> params = new ArrayList<>();
             params.add(ticket);
-            return new RequestOfCommand(getName(), getValue(), params);
+            return new RequestOfCommand(getName(), getValue(), params, client.getLogin(), client.getPassword());
         } catch (NumberFormatException ignored){
             throw new CommandValueException("long");
         } catch (StopCreateTicketExceptionByClient e) {

@@ -3,7 +3,7 @@ package server;
 import commons.exceptions.BadRequestException;
 import commons.exceptions.ServerMainResponseException;
 import commons.requests.RequestOfCommand;
-import commons.respones.ResponseOfCommand;
+import commons.responses.ResponseOfCommand;
 import lombok.Getter;
 import lombok.Setter;
 import commons.exceptions.CommandCollectionZeroException;
@@ -43,10 +43,13 @@ public class Server {
 
     public static void main(String[] args) {
         Server server = new Server();
-        server.tcpServer.openConnection();
-        server.listManager.readTicketList();
+        Server.start(server);
     }
 
+    private static void start(Server server){
+        server.listManager.readTicketList();
+        server.tcpServer.openConnection();
+    }
     public ResponseOfCommand invoke(RequestOfCommand requestOfCommand, int userId) throws ServerMainResponseException {
         try {
             return commandInvoker.invoke(requestOfCommand, userId);

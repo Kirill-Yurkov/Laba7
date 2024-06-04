@@ -34,7 +34,7 @@ public class ListManager {
     }
 
     public void readTicketList() {
-        ticketList = server.getDBManager().getCollectionTicket();
+        ticketList = server.getDBManager().readDB();
         initializeCollection();
     }
 

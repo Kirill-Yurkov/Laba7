@@ -45,7 +45,7 @@ public class AddIfMin implements Command {
             }
             ArrayList<Object> params = new ArrayList<>();
             params.add(ticket);
-            return new RequestOfCommand(getName(), getValue(), params);
+            return new RequestOfCommand(getName(), getValue(), params, client.getLogin(), client.getPassword());
         } catch (StopCreateTicketExceptionByClient e) {
             return null;
         }

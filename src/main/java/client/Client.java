@@ -8,6 +8,7 @@ import commons.exceptions.BadResponseException;
 import commons.exceptions.CommandCollectionZeroException;
 import commons.exceptions.CommandValueException;
 import commons.exceptions.ServerMainResponseException;
+import commons.requests.RequestAuth;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,6 +21,8 @@ public class Client {
     private final InputOutput inputOutput = new InputOutput();
     private final TCPClient tcpClient = new TCPClient(this);
     private boolean clientOn;
+    private String login;
+    private String password;
     @Setter
     private boolean withFile = false;
 
@@ -48,8 +51,6 @@ public class Client {
     private void initialize(){
         clientOn = true;
         tcpClient.openConnection();
-        String login;
-        String password;
         do{
             inputOutput.outPut("Введите логин: \n~");
             login = inputOutput.inPutConsole();
@@ -58,7 +59,14 @@ public class Client {
         }while (!auth(login, password));
     }
     private boolean auth(String login, String password){
-        tcpClient.getAnswer()
+        try {
+            tcpClient.getAnswer(new RequestAuth(login, password));
+            inputOutput.outPut("Успешно авторизировано \n");
+            return true;
+        } catch (BadResponseException e) {
+            inputOutput.outPut("Неверный пароль \n");
+            return false;
+        }
     }
     public void start() {
         boolean isCommandWas = true;

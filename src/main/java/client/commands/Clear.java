@@ -28,7 +28,7 @@ import java.util.ArrayList;
  *
  */
 public class Clear implements Command {
-    private Client server;
+    private Client client;
 
     @Override
     public CommandValues getValue() {
@@ -36,13 +36,13 @@ public class Clear implements Command {
     }
 
     @Override
-    public void setClient(Client server) {
-        this.server = server;
+    public void setClient(Client client) {
+        this.client = client;
     }
 
     @Override
     public RequestOfCommand makeRequest(String value) throws CommandCollectionZeroException {
-        return new RequestOfCommand(getName(), getValue(), new ArrayList<>());
+        return new RequestOfCommand(getName(), getValue(), new ArrayList<>(),client.getLogin(), client.getPassword() );
     }
 
     @Override

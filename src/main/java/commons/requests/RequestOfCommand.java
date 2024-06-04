@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.io.Serializable;
 import java.util.ArrayList;
 @Getter
-public class RequestOfCommand implements Serializable {
+public class RequestOfCommand extends Request {
     private String name;
     private CommandValues commandValues;
     private ArrayList<Object> params;

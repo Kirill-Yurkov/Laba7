@@ -4,7 +4,7 @@ import commons.exceptions.BadRequestException;
 import commons.exceptions.CommandCollectionZeroException;
 import commons.exceptions.CommandValueException;
 import commons.utilities.CommandValues;
-import commons.respones.ResponseOfCommand;
+import commons.responses.ResponseOfCommand;
 import server.Server;
 import server.commands.interfaces.Command;
 
@@ -36,11 +36,11 @@ public class Info implements Command {
 
     @Override
     public ResponseOfCommand makeResponse(ArrayList<Object> params, int userId) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
-        if (server.getReaderWriter().getCollectionInfo().isEmpty()) {
+        if (server.getDBManager().getCollectionInfo().isEmpty()) {
             throw new CommandCollectionZeroException("Collection information will be updating in next save");
         }
         StringBuilder str = new StringBuilder();
-        for (String i : server.getReaderWriter().getCollectionInfo()) {
+        for (String i : server.getDBManager().getCollectionInfo()) {
             str.append("\n").append(i);
         }
         return new ResponseOfCommand(getName(), str.toString());

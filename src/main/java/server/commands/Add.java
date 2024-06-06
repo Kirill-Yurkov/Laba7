@@ -1,12 +1,15 @@
 package server.commands;
 
 import commons.exceptions.BadRequestException;
-import commons.respones.ResponseOfCommand;
+import commons.exceptions.BadResponseException;
+import commons.exceptions.ServerMainResponseException;
+import commons.responses.ResponseOfCommand;
 import server.Server;
 import server.commands.interfaces.Command;
 import commons.patternclass.Ticket;
 import commons.utilities.CommandValues;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -42,13 +45,12 @@ public class Add implements Command {
     @Override
     public ResponseOfCommand makeResponse(ArrayList<Object> params, int userId) throws BadRequestException {
         if(params.get(0) instanceof Ticket){
-            Ticket ticket = (Ticket) params.get(0);
-            ticket.setId(server.getIdCounter().getIdForTicket(ticket));
-            if(ticket.getEvent()!=null){
-                ticket.getEvent().setId(server.getIdCounter().getIdForEvent(ticket.getEvent()));
+            try {
+                server.getListManager().add((Ticket) params.get(0), userId);
+                return new ResponseOfCommand(getName(), "successfully created");
+            } catch (SQLException e) {
+                throw new BadRequestException("error on data base");
             }
-            server.getListManager().add(ticket);
-            return new ResponseOfCommand(getName(), "successfully created");
         }
         throw new BadRequestException("need a Ticket");
     }

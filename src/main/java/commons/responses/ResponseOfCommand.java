@@ -1,12 +1,10 @@
-package commons.respones;
+package commons.responses;
 
 
 import lombok.Getter;
 
-import java.io.Serializable;
-
 @Getter
-public class ResponseOfCommand implements Serializable {
+public class ResponseOfCommand extends Response {
     private String name;
     private String answer;
 

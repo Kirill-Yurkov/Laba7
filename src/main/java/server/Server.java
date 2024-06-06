@@ -9,7 +9,6 @@ import lombok.Setter;
 import commons.exceptions.CommandCollectionZeroException;
 import commons.exceptions.CommandValueException;
 import server.managers.*;
-import server.utilities.IdCounter;
 
 /**
  * The Server class represents a server that handles commands and manages various components.
@@ -34,10 +33,7 @@ public class Server {
     private final CommandInvoker commandInvoker = new CommandInvoker(this);
     private final DBManager DBManager = new DBManager(this);
     private final ListManager listManager = new ListManager(this);
-    private final IdCounter idCounter = new IdCounter(this);
     private final TCPServer tcpServer = new TCPServer(this);
-    private boolean serverOn;
-    @Getter
     @Setter
     private boolean withFile = false;
 

@@ -1,7 +1,7 @@
 package server.commands;
 
 import commons.exceptions.BadRequestException;
-import commons.respones.ResponseOfCommand;
+import commons.responses.ResponseOfCommand;
 import server.Server;
 import server.commands.interfaces.Command;
 import commons.exceptions.CommandCollectionZeroException;
@@ -9,6 +9,7 @@ import commons.exceptions.CommandValueException;
 import commons.patternclass.Ticket;
 import commons.utilities.CommandValues;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -39,46 +40,33 @@ public class Update implements Command {
 
     @Override
     public ResponseOfCommand makeResponse(ArrayList<Object> params, int userId) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
-        if((params.get(0) instanceof Ticket && params.get(1) instanceof Long)||(params.get(1) instanceof Ticket && params.get(0) instanceof Long)){
-            if(params.get(0) instanceof Ticket){
-                long id = (long) params.get(1);
-                if(server.getListManager().getTicketList().isEmpty()){
+        try {
+            if((params.get(0) instanceof Ticket && params.get(1) instanceof Long)||(params.get(1) instanceof Ticket && params.get(0) instanceof Long)){
+                long id;
+                Ticket newTicket;
+                if(params.get(0) instanceof Ticket){
+                    newTicket = (Ticket) params.get(0);
+                    id = (long) params.get(1);
+                } else{
+                    id = (long) params.get(0);
+                    newTicket = (Ticket) params.get(1);
+                }
+                if(server.getListManager().getTicketListOfUser(userId).isEmpty()){
                     throw new CommandCollectionZeroException("collection is zero");
                 }
-                for(Ticket ticket: server.getListManager().getTicketList()){
+                for(Ticket ticket: server.getListManager().getTicketListOfUser(userId)){
                     if (ticket.getId() == id){
-                        server.getListManager().remove(ticket);
-                        Ticket newTicket = (Ticket) params.get(0);
-                        newTicket.setId(id);
-                        if(newTicket.getEvent()!=null){
-                            newTicket.getEvent().setId(server.getIdCounter().getIdForEvent(newTicket.getEvent()));
-                        }
-                        server.getListManager().add(newTicket);
-                        return new ResponseOfCommand(getName(), "successfully");
-                    }
-                }
-                throw new CommandValueException("id not find");
-            } else{
-                long id = (long) params.get(0);
-                if(server.getListManager().getTicketList().isEmpty()){
-                    throw new CommandCollectionZeroException("collection is zero");
-                }
-                for(Ticket ticket: server.getListManager().getTicketList()){
-                    if (ticket.getId() == id){
-                        server.getListManager().remove(ticket);
-                        Ticket newTicket = (Ticket) params.get(1);
-                        newTicket.setId(id);
-                        if(newTicket.getEvent()!=null){
-                            newTicket.getEvent().setId(server.getIdCounter().getIdForEvent(newTicket.getEvent()));
-                        }
-                        server.getListManager().add(newTicket);
+                        server.getListManager().update(newTicket, id);
                         return new ResponseOfCommand(getName(), "successfully");
                     }
                 }
                 throw new CommandValueException("id not find");
             }
+            throw new BadRequestException("need a Ticket and Long");
+        } catch (SQLException e){
+            throw new BadRequestException("error on data base");
         }
-        throw new BadRequestException("need a Ticket and Long");
+
     }
 
     @Override

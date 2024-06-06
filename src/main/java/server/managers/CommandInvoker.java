@@ -3,7 +3,7 @@ package server.managers;
 
 import commons.exceptions.BadRequestException;
 import commons.requests.RequestOfCommand;
-import commons.respones.ResponseOfCommand;
+import commons.responses.ResponseOfCommand;
 import lombok.Getter;
 import server.Server;
 import server.commands.*;

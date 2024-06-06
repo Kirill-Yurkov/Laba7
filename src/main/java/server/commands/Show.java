@@ -3,7 +3,7 @@ package server.commands;
 import commons.exceptions.BadRequestException;
 import commons.exceptions.CommandCollectionZeroException;
 import commons.exceptions.CommandValueException;
-import commons.respones.ResponseOfCommand;
+import commons.responses.ResponseOfCommand;
 import commons.utilities.CommandValues;
 import server.Server;
 import server.commands.interfaces.Command;
@@ -45,14 +45,14 @@ public class Show implements Command {
     @Override
     public ResponseOfCommand makeResponse(ArrayList<Object> params, int userId) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
         StringBuilder str = new StringBuilder();
-        if (server.getListManager().getTicketList().isEmpty()) {
+        if (server.getListManager().getTicketListOfAll().isEmpty()) {
             throw new CommandCollectionZeroException("collection is empty");
         }
-        for (int i = 0; i < server.getListManager().getTicketList().size(); i++) {
-            if (i != server.getListManager().getTicketList().size() - 1){
-                str.append(server.getListManager().getTicketList().get(i).toString()).append("\n");
+        for (int i = 0; i < server.getListManager().getTicketListOfAll().size(); i++) {
+            if (i != server.getListManager().getTicketListOfAll().size() - 1){
+                str.append(server.getListManager().getTicketListOfAll().get(i).toString()).append("\n");
             } else{
-                str.append(server.getListManager().getTicketList().get(i).toString());
+                str.append(server.getListManager().getTicketListOfAll().get(i).toString());
             }
         }
         return new ResponseOfCommand(getName(), String.valueOf(str));

@@ -4,11 +4,12 @@ import commons.exceptions.BadRequestException;
 import commons.exceptions.CommandCollectionZeroException;
 import commons.exceptions.CommandValueException;
 import commons.patternclass.Ticket;
-import commons.respones.ResponseOfCommand;
+import commons.responses.ResponseOfCommand;
 import commons.utilities.CommandValues;
 import server.Server;
 import server.commands.interfaces.Command;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,23 +57,27 @@ public class RemoveLower implements Command {
 
     @Override
     public ResponseOfCommand makeResponse(ArrayList<Object> params, int userId) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
-        if(params.get(0) instanceof Ticket) {
-            Ticket newTicket = (Ticket) params.get(0);
-            List<Ticket> removeList = new ArrayList<>();
-            if (server.getListManager().getTicketList().isEmpty()) {
-                throw new CommandCollectionZeroException("collection is zero");
-            }
-            for (Ticket ticket : server.getListManager().getTicketList()) {
-                if (ticket.getPrice() < newTicket.getPrice()) {
-                    removeList.add(ticket);
+        try {
+            if(params.get(0) instanceof Ticket newTicket) {
+                List<Ticket> removeList = new ArrayList<>();
+                if (server.getListManager().getTicketListOfUser(userId).isEmpty()) {
+                    throw new CommandCollectionZeroException("YOUR collection is zero");
                 }
+                for (Ticket ticket : server.getListManager().getTicketListOfUser(userId)) {
+                    if (ticket.getPrice() < newTicket.getPrice()) {
+                        removeList.add(ticket);
+                    }
+                }
+                for (Ticket ticket : removeList) {
+                    server.getListManager().getTicketListOfUser(userId).remove(ticket);
+                }
+                return new ResponseOfCommand(getName(), "successfully");
             }
-            for (Ticket ticket : removeList) {
-                server.getListManager().getTicketList().remove(ticket);
-            }
-            return new ResponseOfCommand(getName(), "successfully");
+            throw new BadRequestException("need a Ticket");
+        } catch (SQLException e){
+            throw new BadRequestException("error on data base");
         }
-        throw new BadRequestException("need a Ticket");
+
     }
 
     @Override

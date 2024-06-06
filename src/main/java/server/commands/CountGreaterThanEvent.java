@@ -1,7 +1,7 @@
 package server.commands;
 
 import commons.exceptions.BadRequestException;
-import commons.respones.ResponseOfCommand;
+import commons.responses.ResponseOfCommand;
 import server.Server;
 import server.commands.interfaces.Command;
 import commons.exceptions.CommandCollectionZeroException;
@@ -39,11 +39,11 @@ public class CountGreaterThanEvent implements Command {
     @Override
     public ResponseOfCommand makeResponse(ArrayList<Object> params, int userId) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
         if(params.get(0) instanceof Integer){
-            if (server.getListManager().getTicketList().isEmpty()) {
+            if (server.getListManager().getTicketListOfAll().isEmpty()) {
                 throw new CommandCollectionZeroException("collection is zero");
             }
             int value = (int) params.get(0);
-            long count = server.getListManager().getTicketList().stream()
+            long count = server.getListManager().getTicketListOfAll().stream()
                     .filter(ticket -> ticket.getEvent() != null && ticket.getEvent().getTicketsCount() > value)
                     .count();
             return new ResponseOfCommand(getName(), "Count events greater than " + value + " by ticket count: " + count + "\n");

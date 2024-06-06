@@ -52,19 +52,23 @@ public class Client {
         clientOn = true;
         tcpClient.openConnection();
         do{
-            inputOutput.outPut("Введите логин: \n~");
+            inputOutput.outPut("Введите логин: \n~ ");
             login = inputOutput.inPutConsole();
-            inputOutput.outPut("Введите пароль: \n~");
+            inputOutput.outPut("Введите пароль: \n~ ");
             password = inputOutput.inPutConsole();
         }while (!auth(login, password));
     }
     private boolean auth(String login, String password){
         try {
+            if (login.isBlank() || password.isBlank()){
+                inputOutput.outPut("Уберите пустые строки \n");
+                return false;
+            }
             tcpClient.getAnswer(new RequestAuth(login, password));
-            inputOutput.outPut("Успешно авторизировано \n");
+            inputOutput.outPut(tcpClient.getAnswer(new RequestAuth(login, password)) + " \n");
             return true;
         } catch (BadResponseException e) {
-            inputOutput.outPut("Неверный пароль \n");
+            inputOutput.outPut("Problem: " + e.getMessage() + " \n");
             return false;
         }
     }

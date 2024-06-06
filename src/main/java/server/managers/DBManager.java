@@ -10,6 +10,8 @@ import lombok.NonNull;
 import server.Server;
 
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -105,6 +107,7 @@ public class DBManager {
     private static final String SELECT_USERS = "SELECT id, login, password FROM users";
     private static final String SELECT_USER_BY_LOGIN = "SELECT id, login, password FROM users WHERE login = ?";
     private static final String SELECT_TICKETS = "SELECT id, name, coordinates_x, coordinates_y, created_at, price, ticket_type, event_id, user_id FROM tickets";
+    private static final String SELECT_TICKETS_BY_USER = "SELECT id, name, coordinates_x, coordinates_y, created_at, price, ticket_type, event_id, user_id FROM tickets Where user_id = ?";
     private static final String SELECT_TICKET_BY_ID = "SELECT id, name, coordinates_x, coordinates_y, created_at, price, ticket_type, event_id, user_id FROM tickets WHERE id = ?";
     private static final String SELECT_EVENT_BY_ID = "SELECT id, name, min_age, tickets_count, description FROM events WHERE id = ?";
     private static final String SELECT_EVENT_BY_NAME = "SELECT id, name, min_age, tickets_count, description FROM events WHERE name = ?";
@@ -174,7 +177,7 @@ public class DBManager {
         return ticket;
     }
 
-    public Ticket readTicketFromTableById(int ticketId) {
+    public Ticket readTicketFromTableById(int ticketId) throws SQLException {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_TICKET_BY_ID)) {
 
@@ -185,12 +188,29 @@ public class DBManager {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            LOGGER.severe("problem with reading ticket from table by userId: " +e.getMessage());
+            throw new SQLException();
         }
         return null;
     }
+    public List<Ticket> readTicketsFromTableByUserId(int userId) throws SQLException {
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_TICKETS_BY_USER)) {
+            List<Ticket> tickets = new ArrayList<>();
+            preparedStatement.setInt(1, userId);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    tickets.add(readTicket(resultSet));
+                }
+            }
+            return tickets;
+        } catch (SQLException e) {
+            LOGGER.severe("problem with reading tickets from table by userId: " +e.getMessage());
+            throw new SQLException();
+        }
+    }
 
-    public Event readEventFromTableById(int eventId) {
+    public Event readEventFromTableById(int eventId) throws SQLException {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_EVENT_BY_ID)) {
 
@@ -209,13 +229,14 @@ public class DBManager {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            LOGGER.severe("problem with reading event: " + e.getMessage());
+            throw new SQLException();
         }
         return null;
     }
 
     @NonNull
-    public Long writeTicketWithoutId(Ticket ticket, int idUser) {
+    public Long writeTicketWithoutId(Ticket ticket, int idUser) throws SQLException {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_TICKET_SQL, new String[]{"id"})) {
             preparedStatement.setString(1, ticket.getName());
@@ -238,11 +259,12 @@ public class DBManager {
         } catch (SQLException e) {
             // Обработка исключений SQL
             LOGGER.severe("Error occurred while inserting tickets: " + e.getMessage());
+            throw new SQLException();
         }
         return null;
     }
 
-    public Integer writeEventWithCheckForExist(Event event) {
+    public Integer writeEventWithCheckForExist(Event event) throws SQLException {
         if (event == null) {
             return null;
         }
@@ -255,12 +277,13 @@ public class DBManager {
                 }
             }
             return writeEventWithoutId(event);
-        } catch (SQLException ignored) {
-            return writeEventWithoutId(event);
+        } catch (SQLException e) {
+            LOGGER.severe("Problem on write event: " + e.getMessage());
+            throw new SQLException();
         }
     }
 
-    private Integer writeEventWithoutId(Event event) {
+    private Integer writeEventWithoutId(Event event) throws SQLException {
         if (event == null) {
             return null;
         }
@@ -280,16 +303,16 @@ public class DBManager {
         } catch (SQLException e) {
             // Обработка исключений SQL
             LOGGER.severe("Error occurred while inserting tickets: " + e.getMessage());
-            System.err.println(e.getMessage());
+            throw new SQLException();
         }
         return null;
     }
 
-    private Integer writeUserWithoutId(String login, String password) {
+    private Integer writeUserWithoutId(String login, String password) throws SQLException {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_USER_SQL, new String[]{"id"});
             preparedStatement.setString(1, login);
-            preparedStatement.setString(2, password);
+            preparedStatement.setString(2, sha1Hash(password));
             int rowsAffected = preparedStatement.executeUpdate();
             LOGGER.info("Добавлено атрибутов " + rowsAffected);
             ResultSet rs = preparedStatement.getGeneratedKeys();
@@ -299,6 +322,7 @@ public class DBManager {
         } catch (SQLException e) {
             // Обработка исключений SQL
             LOGGER.severe("error while get id for user by login: " + e.getMessage());
+            throw new SQLException();
         }
         return null;
     }
@@ -323,7 +347,7 @@ public class DBManager {
         } catch (SQLException e) {
             // Обработка исключений SQL
             LOGGER.severe("Error occurred while updating item: " + e.getMessage());
-            e.printStackTrace();
+            throw new SQLException();
         }
     }
 
@@ -341,17 +365,20 @@ public class DBManager {
         } catch (SQLException e) {
             // Обработка исключений SQL
             LOGGER.severe("Error occurred while deleting item: " + e.getMessage());
-
+            throw new SQLException();
         }
     }
 
     public Integer checkAuth(String login, String password) throws AuthException {
+        if(login.isBlank()||password.isBlank()){
+            throw new AuthException("empty strings");
+        }
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_USERS);
              ResultSet resultSet = preparedStatement.executeQuery()) {
             while (resultSet.next()) {
                 if (login.equals(resultSet.getString("login"))) {
-                    if (password.equals(resultSet.getString("password"))) {
+                    if (sha1Hash(password).equals(resultSet.getString("password"))) {
                         return resultSet.getInt("id");
                     } else {
                         throw new AuthException("incorrect password");
@@ -362,6 +389,19 @@ public class DBManager {
         } catch (SQLException e) {
             System.err.println(e.getMessage());
             return null;
+        }
+    }
+    private static String sha1Hash(String password) {
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
+            byte[] hashBytes = messageDigest.digest(password.getBytes());
+            StringBuilder stringBuilder = new StringBuilder();
+            for (byte b : hashBytes) {
+                stringBuilder.append(String.format("%02x", b));
+            }
+            return stringBuilder.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         }
     }
 }

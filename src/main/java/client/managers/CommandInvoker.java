@@ -6,8 +6,8 @@ import client.commands.interfaces.Command;
 import commons.exceptions.BadResponseException;
 import commons.exceptions.CommandCollectionZeroException;
 import commons.exceptions.CommandValueException;
-import commons.respones.ResponseOfCommand;
-import commons.respones.ResponseOfException;
+import commons.responses.ResponseOfCommand;
+import commons.responses.ResponseOfException;
 import lombok.Getter;
 
 import java.util.ArrayList;

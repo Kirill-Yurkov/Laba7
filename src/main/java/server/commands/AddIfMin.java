@@ -4,11 +4,12 @@ import commons.exceptions.BadRequestException;
 import commons.exceptions.CommandCollectionZeroException;
 import commons.exceptions.CommandValueException;
 import commons.patternclass.Ticket;
-import commons.respones.ResponseOfCommand;
+import commons.responses.ResponseOfCommand;
 import commons.utilities.CommandValues;
 import server.Server;
 import server.commands.interfaces.Command;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -38,25 +39,25 @@ public class AddIfMin implements Command {
     }
 
     @Override
-    public ResponseOfCommand makeResponse(ArrayList<Object> params, int uesrId) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
-        if (server.getListManager().getTicketList().isEmpty()) {
-            throw new CommandCollectionZeroException("collection is zero");
-        }
-        if(params.get(0) instanceof Ticket){
-            Ticket ticket = (Ticket) params.get(0);
-            int mini = server.getListManager().getTicketList().stream()
-                    .filter(localTicket -> localTicket.getPrice() != null)
-                    .mapToInt(Ticket::getPrice)
-                    .min()
-                    .orElse(Integer.MAX_VALUE);
-            if (ticket.getPrice() < mini) {
-                ticket.setId(server.getIdCounter().getIdForTicket(ticket));
-                if (ticket.getEvent() != null) {
-                    ticket.getEvent().setId(server.getIdCounter().getIdForEvent(ticket.getEvent()));
-                }
-                return new ResponseOfCommand(getName(), "successfully added");
+    public ResponseOfCommand makeResponse(ArrayList<Object> params, int userId) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
+        try {
+            if (server.getListManager().getTicketListOfUser(userId).isEmpty()) {
+                throw new CommandCollectionZeroException("YOUR collection is zero");
             }
-            throw new CommandValueException("price more than minimal");
+            if (params.get(0) instanceof Ticket ticket) {
+                int mini = server.getListManager().getTicketListOfUser(userId).stream()
+                        .filter(localTicket -> localTicket.getPrice() != null)
+                        .mapToInt(Ticket::getPrice)
+                        .min()
+                        .orElse(Integer.MAX_VALUE);
+                if (ticket.getPrice() < mini) {
+                    server.getListManager().add(ticket, userId);
+                    return new ResponseOfCommand(getName(), "successfully added");
+                }
+                throw new CommandValueException("price more than minimal");
+            }
+        }catch (SQLException e){
+            throw new BadRequestException("error on data base");
         }
         throw new BadRequestException("need a Ticket");
     }

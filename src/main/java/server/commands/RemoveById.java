@@ -1,7 +1,7 @@
 package server.commands;
 
 import commons.exceptions.BadRequestException;
-import commons.respones.ResponseOfCommand;
+import commons.responses.ResponseOfCommand;
 import server.Server;
 import server.commands.interfaces.Command;
 import commons.exceptions.CommandCollectionZeroException;
@@ -9,6 +9,7 @@ import commons.exceptions.CommandValueException;
 import commons.patternclass.Ticket;
 import commons.utilities.CommandValues;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -50,20 +51,25 @@ public class RemoveById implements Command {
 
     @Override
     public ResponseOfCommand makeResponse(ArrayList<Object> params, int userId) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
-        if(params.get(0) instanceof Long){
-            if(server.getListManager().getTicketList().isEmpty()){
-                throw new CommandCollectionZeroException("collection is empty");
-            }
-            long id = (long) params.get(0);
-            for(Ticket ticket: server.getListManager().getTicketList()){
-                if(ticket.getId() == id){
-                    server.getListManager().remove(ticket);
-                    return new ResponseOfCommand(getName(), "successfully");
+        try {
+            if(params.get(0) instanceof Long){
+                if(server.getListManager().getTicketListOfUser(userId).isEmpty()){
+                    throw new CommandCollectionZeroException("YOUR collection is empty");
                 }
+                long id = (long) params.get(0);
+                for(Ticket ticket: server.getListManager().getTicketListOfUser(userId)){
+                    if(ticket.getId() == id){
+                        server.getListManager().remove(ticket);
+                        return new ResponseOfCommand(getName(), "successfully");
+                    }
+                }
+                throw new CommandValueException("id not find");
             }
-            throw new CommandValueException("id not find");
+            throw new BadRequestException("need a Long");
+        } catch (SQLException e){
+            throw new BadRequestException("error on data base");
         }
-        throw new BadRequestException("need a Long");
+
     }
 
 

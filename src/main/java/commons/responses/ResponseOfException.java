@@ -1,12 +1,10 @@
-package commons.respones;
+package commons.responses;
 
 
 import lombok.Getter;
 
-import java.io.Serializable;
-
 @Getter
-public class ResponseOfException implements Serializable {
+public class ResponseOfException extends Response {
     private String name;
     private Exception exception ;
     public ResponseOfException(String name, Exception exception){

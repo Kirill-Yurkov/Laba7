@@ -2,13 +2,14 @@ package server.commands;
 
 import commons.exceptions.BadRequestException;
 import commons.exceptions.CommandValueException;
-import commons.respones.ResponseOfCommand;
+import commons.responses.ResponseOfCommand;
 import server.Server;
 import server.commands.interfaces.Command;
 import commons.exceptions.CommandCollectionZeroException;
 import commons.patternclass.Ticket;
 import commons.utilities.CommandValues;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 /**
@@ -45,12 +46,19 @@ public class Clear implements Command {
 
     @Override
     public ResponseOfCommand makeResponse(ArrayList<Object> params, int userId) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
-        List<Ticket> tickets = new ArrayList<>();
-        if (server.getListManager().getTicketList().isEmpty()) {
-            throw new CommandCollectionZeroException("collection is empty");
+        try {
+            List<Ticket> tickets = server.getListManager().getTicketListOfUser(userId);
+            if (tickets.isEmpty()) {
+                throw new CommandCollectionZeroException("YOUR collection is empty");
+            }
+            for (Ticket ticket: tickets){
+                server.getListManager().remove(ticket);
+            }
+            return new ResponseOfCommand(getName(), "successfully cleaned");
+        }catch (SQLException e){
+            throw new BadRequestException("error on data base");
         }
-        server.getListManager().setTicketList(tickets);
-        return new ResponseOfCommand(getName(), "successfully cleaned");
+
     }
 
 

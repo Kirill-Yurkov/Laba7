@@ -1,7 +1,7 @@
 package server.commands;
 
 import commons.exceptions.BadRequestException;
-import commons.respones.ResponseOfCommand;
+import commons.responses.ResponseOfCommand;
 import server.Server;
 import server.commands.interfaces.Command;
 import commons.exceptions.CommandCollectionZeroException;
@@ -46,10 +46,10 @@ public class FilterLessThanType implements Command {
         if(params.get(0) instanceof TicketType){
             TicketType type = (TicketType) params.get(0);
             StringBuilder str = new StringBuilder();
-            if(server.getListManager().getTicketList().isEmpty()){
+            if(server.getListManager().getTicketListOfAll().isEmpty()){
                 throw new CommandCollectionZeroException("collection is empty");
             }
-            for(Ticket ticket: server.getListManager().getTicketList()){
+            for(Ticket ticket: server.getListManager().getTicketListOfAll()){
                 if(type.getPriority()<ticket.getType().getPriority()){
                     str.append(ticket).append("\n");
                 }

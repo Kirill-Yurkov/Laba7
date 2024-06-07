@@ -38,9 +38,7 @@ public class InputOutput {
         if(readerConsole!=null){
             try {
                 return readerConsole.readLine();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            } catch (IOException ignored) {}
         }
         return null;
     }

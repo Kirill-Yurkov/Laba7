@@ -244,9 +244,7 @@ public class DBManager {
             preparedStatement.setLong(3, ticket.getCoordinates().getY());
             preparedStatement.setObject(4, ticket.getPrice(), Types.INTEGER);
             preparedStatement.setString(5, ticket.getType().name());
-            System.out.println(ticket.getEvent());
             Integer abc = writeEventWithCheckForExist(ticket.getEvent());
-            System.out.println(abc);
             preparedStatement.setObject(6, abc, Types.INTEGER);
             preparedStatement.setInt(7, idUser);
             // Выполняем запрос для вставки данных
@@ -387,7 +385,7 @@ public class DBManager {
             }
             return writeUserWithoutId(login, password);
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
+            LOGGER.severe("problem on checking auth: " +e.getMessage());
             return null;
         }
     }

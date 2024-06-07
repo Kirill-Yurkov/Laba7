@@ -43,12 +43,13 @@ public class TCPClient {
     public TCPClient(Client client){
         this.client = client;
     }
-    public void openConnection() {
+    public boolean openConnection() {
         client.getInputOutput().outPut("Подключение к серверу...\n");
         if (!checkConnection()) {
             client.stop();
-            closeConnection();
+            return false;
         }
+        return true;
     }
     private boolean checkConnection(){
         int attempts = 0;
@@ -92,8 +93,11 @@ public class TCPClient {
                 throw new BadResponseException("bad response");
             }
         } catch (EOFException | SocketException e){
-            checkConnection();
-            return "Переподключаюсь...";
+            if(checkConnection()){
+                return "Вы можете заново работать с сервером.";
+            }
+            client.stop();
+            return "Не подключено.";
         } catch (IOException | ClassNotFoundException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw new BadResponseException("bad channel");

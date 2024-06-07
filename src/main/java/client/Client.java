@@ -40,17 +40,19 @@ public class Client {
 
     public void stop() {
         clientOn = false;
+        tcpClient.closeConnection();
         try {
             inputOutput.getReaderConsole().close();
             inputOutput.getWriter().close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        } catch (IOException ignored) {}
+        System.exit(0);
     }
 
     private void initialize(){
         clientOn = true;
-        tcpClient.openConnection();
+        if(!tcpClient.openConnection()){
+            return;
+        }
         do{
             inputOutput.outPut("Введите логин: \n~ ");
             login = inputOutput.inPutConsole();

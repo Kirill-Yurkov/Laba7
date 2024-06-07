@@ -54,6 +54,6 @@ public class Info implements Command {
 
     @Override
     public String description() {
-        return "вывести в стандартный поток вывода информацию о коллекции";
+        return "output information about the collection to the standard output stream";
     }
 }

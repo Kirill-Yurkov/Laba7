@@ -54,16 +54,16 @@ public class Client {
             return;
         }
         do{
-            inputOutput.outPut("Введите логин: \n~ ");
-            login = inputOutput.inPutConsole();
-            inputOutput.outPut("Введите пароль: \n~ ");
-            password = inputOutput.inPutConsole();
+            inputOutput.outPut("Enter your username: \n~ ");
+            login = inputOutput.inPutConsole().strip();
+            inputOutput.outPut("Enter your password: \n~ ");
+            password = inputOutput.inPutConsole().strip();
         }while (!auth(login, password));
     }
     private boolean auth(String login, String password){
         try {
             if (login.isBlank() || password.isBlank()){
-                inputOutput.outPut("Уберите пустые строки \n");
+                inputOutput.outPut("Remove the empty lines from the auth \n");
                 return false;
             }
             tcpClient.getAnswer(new RequestAuth(login, password));
@@ -80,13 +80,13 @@ public class Client {
         while (clientOn) {
             try {
                 if (isCommandWas){
-                    inputOutput.outPut("Введите комманду (для справки используйте комманду help) \n~ ");
+                    inputOutput.outPut("Enter the command (use the 'help' command for help) \n~ ");
                 } else {
                     inputOutput.outPut("~ ");
                 }
                 String commandFromConsole = inputOutput.inPutConsole();
                 if (commandFromConsole == null){
-                    inputOutput.outPut("\nПолучен сигнал завершения работы.");
+                    inputOutput.outPut("\nA shutdown signal has been received.");
                     stop();
                     return;
                 }

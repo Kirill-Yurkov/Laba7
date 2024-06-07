@@ -51,6 +51,6 @@ public class AverageOfPrice implements Command {
 
     @Override
     public String description() {
-        return "<> вывести среднее значение поля price для всех элементов коллекции";
+        return "<> print the average value of the price field for all tickets in the collection";
     }
 }

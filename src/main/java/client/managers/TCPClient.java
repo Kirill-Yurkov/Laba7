@@ -37,14 +37,14 @@ public class TCPClient {
             fileHandler.setFormatter(new SimpleFormatter());
             LOGGER.addHandler(fileHandler);
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Ошибка настройки логгера: " + e.getMessage(), e);
+            LOGGER.log(Level.SEVERE, "Error setting up the logger: " + e.getMessage(), e);
         }
     }
     public TCPClient(Client client){
         this.client = client;
     }
     public boolean openConnection() {
-        client.getInputOutput().outPut("Подключение к серверу...\n");
+        client.getInputOutput().outPut("Connecting to the server...\n");
         if (!checkConnection()) {
             client.stop();
             return false;
@@ -58,13 +58,13 @@ public class TCPClient {
                 socket = new Socket("localhost", 7777);
                 inPort = new ObjectInputStream(socket.getInputStream());
                 outPort = new ObjectOutputStream(socket.getOutputStream());
-                LOGGER.info("Подключение к серверу выполнено. "+socket);
-                client.getInputOutput().outPut("Подключение к серверу выполнено\n");
+                LOGGER.info("The connection to the server has been completed. "+socket);
+                client.getInputOutput().outPut("The connection to the server has been completed.\n");
                 return true;
             } catch (IOException e) {
                 attempts++;
-                LOGGER.warning("Не удалось подключиться к серверу. Повторная попытка через 3 секунды...");
-                client.getInputOutput().outPut("Не удалось подключиться к серверу. Повторная попытка через 3 секунды...\n");
+                LOGGER.warning("Failed to connect to the server. Try again in 3 seconds...");
+                client.getInputOutput().outPut("Failed to connect to the server. Try again in 3 seconds...\n");
                 try {
                     TimeUnit.MILLISECONDS.sleep(CONNECTION_RETRY_DELAY);
                 } catch (InterruptedException ex) {
@@ -72,8 +72,8 @@ public class TCPClient {
                 }
             }
         }
-        client.getInputOutput().outPut("Превышено количество попыток подключения. Завершение работы клиента.\n");
-        LOGGER.severe("Превышено количество попыток подключения. Завершение работы клиента.");
+        client.getInputOutput().outPut("The number of connection attempts has been exceeded. Client shutdown.\n");
+        LOGGER.severe("The number of connection attempts has been exceeded. Client shutdown.");
         return false;
     }
 
@@ -83,21 +83,21 @@ public class TCPClient {
             outPort.flush();
             Object response = inPort.readObject();
             if (response instanceof ResponseOfCommand) {
-                LOGGER.info("От сервера: " + response);
+                LOGGER.info("From server: " + response);
                 return client.getCommandInvoker().invokeFromResponse((ResponseOfCommand) response);
             } else if (response instanceof ResponseOfException) {
-                LOGGER.info("Ответ от сервре" + response);
+                LOGGER.info("Answer from server: " + response);
                 throw new BadResponseException(client.getCommandInvoker().invokeFromResponseException((ResponseOfException) response));
             } else {
-                LOGGER.warning("Неверный формат ответа от сервера.");
+                LOGGER.warning("Invalid response format from the server.");
                 throw new BadResponseException("bad response");
             }
         } catch (EOFException | SocketException e){
             if(checkConnection()){
-                return "Вы можете заново работать с сервером.";
+                return "You can work with the server again.";
             }
             client.stop();
-            return "Не подключено.";
+            return "It is not connected.";
         } catch (IOException | ClassNotFoundException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw new BadResponseException("bad channel");
@@ -115,7 +115,7 @@ public class TCPClient {
                 socket.close();
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Ошибка при закрытии соединения: " + e.getMessage(), e);
+            LOGGER.log(Level.SEVERE, "Error closing the connection: " + e.getMessage(), e);
         }
     }
 }

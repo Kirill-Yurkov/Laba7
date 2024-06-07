@@ -58,6 +58,6 @@ public class AddIfMin implements Command {
 
     @Override
     public String description() {
-        return "<Ticket> добавить новый элемент в коллекцию, если его значение меньше (price), чем у наименьшего элемента этой коллекции";
+        return "<Ticket> add a new ticket to the collection if its value (price) is less than the smallest item in this collection";
     }
 }

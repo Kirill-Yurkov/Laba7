@@ -53,6 +53,6 @@ public class Shuffle implements Command {
 
     @Override
     public String description() {
-        return "<> перемешать элементы коллекции в случайном порядке";
+        return "<> shuffle the collection tickets in random order";
     }
 }

@@ -66,6 +66,6 @@ public class RemoveById implements Command {
 
     @Override
     public String description() {
-        return "<long> удалить элемент из коллекции по его id";
+        return "<long> delete an ticket from the collection by its id";
     }
 }

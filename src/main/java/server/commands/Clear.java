@@ -69,6 +69,6 @@ public class Clear implements Command {
 
     @Override
     public String description() {
-        return "очистить коллекцию";
+        return "clear the collection";
     }
 }

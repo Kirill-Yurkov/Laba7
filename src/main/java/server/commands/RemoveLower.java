@@ -87,6 +87,6 @@ public class RemoveLower implements Command {
 
     @Override
     public String description() {
-        return "удалить из коллекции все элементы, меньшие, чем заданный(по price)";
+        return "remove all tickets from the collection that are smaller than the specified one (by price)";
     }
 }

@@ -9,6 +9,7 @@ import commons.exceptions.CommandCollectionZeroException;
 import commons.patternclass.Ticket;
 import commons.utilities.CommandValues;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -44,15 +45,20 @@ public class AverageOfPrice implements Command {
 
     @Override
     public ResponseOfCommand makeResponse(ArrayList<Object> params, int userId) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
-        int price = server.getListManager().getTicketListOfAll().stream()
-                .filter(ticket -> ticket.getPrice() != null)
-                .mapToInt(Ticket::getPrice)
-                .sum();
-        if (server.getListManager().getTicketListOfAll().isEmpty()) {
-            throw new CommandCollectionZeroException("collection is zero");
-        } else {
-            return new ResponseOfCommand(getName(),String.valueOf(price / server.getListManager().getTicketListOfAll().size()));
+        try {
+            int price = server.getListManager().getTicketListOfAll().stream()
+                    .filter(ticket -> ticket.getPrice() != null)
+                    .mapToInt(Ticket::getPrice)
+                    .sum();
+            if (server.getListManager().getTicketListOfAll().isEmpty()) {
+                throw new CommandCollectionZeroException("collection is zero");
+            } else {
+                return new ResponseOfCommand(getName(),String.valueOf(price / server.getListManager().getTicketListOfAll().size()));
+            }
+        }catch (SQLException e){
+            throw new BadRequestException("error on data base");
         }
+
     }
 
     @Override

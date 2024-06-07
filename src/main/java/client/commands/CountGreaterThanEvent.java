@@ -56,6 +56,6 @@ public class CountGreaterThanEvent implements Command {
 
     @Override
     public String description() {
-        return "<int> вывести количество элементов, значение поля event(tickets count) которых больше заданного";
+        return "<int> print the number of items whose event(tickets count) field value is greater than the specified one";
     }
 }

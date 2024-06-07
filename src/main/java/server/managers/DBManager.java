@@ -49,8 +49,14 @@ public class DBManager {
     private List<Ticket> collectionTicket = new ArrayList<>();
 
     private static final String URL = "jdbc:postgresql://localhost:5432/postgres";
+    // jdbc:postgresql://localhost:5432/postgres
+    // jdbc:postgresql://pg:5432/studs
     private static final String USER = "postgres";
+    // postgres
+    // s409936
     private static final String PASSWORD = "123";
+    // 123
+    // fVbN4A91DGSYl7CG
 
     static {
         try {
@@ -68,7 +74,7 @@ public class DBManager {
             fileHandler.setFormatter(new SimpleFormatter());
             LOGGER.addHandler(fileHandler);
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Ошибка настройки логгера: " + e.getMessage(), e);
+            LOGGER.log(Level.SEVERE, "Error setting up the logger: " + e.getMessage(), e);
         }
     }
 
@@ -131,22 +137,18 @@ public class DBManager {
             LOGGER.info("Items table created successfully");
         } catch (SQLException e) {
             // Обработка исключений SQL
-            LOGGER.severe("Error occurred while creating tables: " + e.getMessage());
+            LOGGER.log(Level.SEVERE,"Error occurred while creating tables: " + e.getMessage(), e);
             throw new SQLException("error occurred while creating tables: " + e.getMessage());
         }
     }
 
-    public List<Ticket> readDB() {
-        try {
-            createTable();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+    public List<Ticket> readDB() throws SQLException {
+        createTable();
         return readAllTicketsFromTable();
     }
 
 
-    public List<Ticket> readAllTicketsFromTable() {
+    public List<Ticket> readAllTicketsFromTable() throws SQLException {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_TICKETS);
              ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -157,7 +159,8 @@ public class DBManager {
             }
             return list;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            LOGGER.log(Level.SEVERE,"Error occurred while reading ALL tickets: " + e.getMessage(), e);
+            throw new SQLException(e.getMessage());
         }
     }
 
@@ -188,7 +191,7 @@ public class DBManager {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.severe("problem with reading ticket from table by userId: " +e.getMessage());
+            LOGGER.log(Level.SEVERE,"Error occurred while reading ticket from table by ticket id: " + e.getMessage(), e);
             throw new SQLException();
         }
         return null;
@@ -205,7 +208,7 @@ public class DBManager {
             }
             return tickets;
         } catch (SQLException e) {
-            LOGGER.severe("problem with reading tickets from table by userId: " +e.getMessage());
+            LOGGER.log(Level.SEVERE,"Error occurred while reading tickets from table by userID: " + e.getMessage(), e);
             throw new SQLException();
         }
     }
@@ -229,7 +232,7 @@ public class DBManager {
             }
 
         } catch (SQLException e) {
-            LOGGER.severe("problem with reading event: " + e.getMessage());
+            LOGGER.log(Level.SEVERE,"Error occurred while reading event: " + e.getMessage(), e);
             throw new SQLException();
         }
         return null;
@@ -249,14 +252,14 @@ public class DBManager {
             preparedStatement.setInt(7, idUser);
             // Выполняем запрос для вставки данных
             int rowsAffected = preparedStatement.executeUpdate();
-            LOGGER.info("Добавлено атрибутов " + rowsAffected);
+            LOGGER.info("Added attributes " + rowsAffected);
             ResultSet rs = preparedStatement.getGeneratedKeys();
             if (rs.next()) {
                 return rs.getLong(1);
             }
         } catch (SQLException e) {
             // Обработка исключений SQL
-            LOGGER.severe("Error occurred while inserting tickets: " + e.getMessage());
+            LOGGER.log(Level.SEVERE,"Error occurred while inserting tickets: " + e.getMessage(), e);
             throw new SQLException();
         }
         return null;
@@ -276,7 +279,7 @@ public class DBManager {
             }
             return writeEventWithoutId(event);
         } catch (SQLException e) {
-            LOGGER.severe("Problem on write event: " + e.getMessage());
+            LOGGER.log(Level.SEVERE,"Error occurred while inserting event: " + e.getMessage(), e);
             throw new SQLException();
         }
     }
@@ -293,14 +296,14 @@ public class DBManager {
             preparedStatement.setObject(4, event.getDescription(), Types.VARCHAR);
             // Выполняем запрос для вставки данных
             int rowsAffected = preparedStatement.executeUpdate();
-            LOGGER.info("Добавлено атрибутов " + rowsAffected);
+            LOGGER.info("Added attributes " + rowsAffected);
             ResultSet rs = preparedStatement.getGeneratedKeys();
             if (rs.next()) {
                 return rs.getInt("id");
             }
         } catch (SQLException e) {
             // Обработка исключений SQL
-            LOGGER.severe("Error occurred while inserting tickets: " + e.getMessage());
+            LOGGER.log(Level.SEVERE,"Error occurred while inserting events without id: " + e.getMessage(), e);
             throw new SQLException();
         }
         return null;
@@ -312,14 +315,14 @@ public class DBManager {
             preparedStatement.setString(1, login);
             preparedStatement.setString(2, sha1Hash(password));
             int rowsAffected = preparedStatement.executeUpdate();
-            LOGGER.info("Добавлено атрибутов " + rowsAffected);
+            LOGGER.info("Added attributes " + rowsAffected);
             ResultSet rs = preparedStatement.getGeneratedKeys();
             if (rs.next()) {
                 return rs.getInt(1);
             }
         } catch (SQLException e) {
             // Обработка исключений SQL
-            LOGGER.severe("error while get id for user by login: " + e.getMessage());
+            LOGGER.log(Level.SEVERE,"Error occurred while get id for user by login: " + e.getMessage(), e);
             throw new SQLException();
         }
         return null;
@@ -340,11 +343,11 @@ public class DBManager {
             preparedStatement.setLong(8, ticketId);
             // Выполняем запрос для обновления данных
             int rowsAffected = preparedStatement.executeUpdate();
-            LOGGER.info("Item updated: " + rowsAffected);
+            LOGGER.info("Ticket updated: " + rowsAffected);
 
         } catch (SQLException e) {
             // Обработка исключений SQL
-            LOGGER.severe("Error occurred while updating item: " + e.getMessage());
+            LOGGER.log(Level.SEVERE,"Error occurred while updating ticket by Id: " + e.getMessage(), e);
             throw new SQLException();
         }
     }
@@ -358,11 +361,11 @@ public class DBManager {
 
             // Выполняем запрос для удаления данных
             int rowsAffected = preparedStatement.executeUpdate();
-            LOGGER.info("Item deleted: " + rowsAffected);
+            LOGGER.info("Ticket deleted: " + rowsAffected);
 
         } catch (SQLException e) {
             // Обработка исключений SQL
-            LOGGER.severe("Error occurred while deleting item: " + e.getMessage());
+            LOGGER.log(Level.SEVERE,"Error occurred while deleting ticket: " + e.getMessage(), e);
             throw new SQLException();
         }
     }
@@ -385,7 +388,7 @@ public class DBManager {
             }
             return writeUserWithoutId(login, password);
         } catch (SQLException e) {
-            LOGGER.severe("problem on checking auth: " +e.getMessage());
+            LOGGER.log(Level.SEVERE,"Error occurred while checking auth: " + e.getMessage(), e);
             return null;
         }
     }

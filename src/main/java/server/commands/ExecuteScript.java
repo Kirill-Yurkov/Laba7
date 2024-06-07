@@ -61,6 +61,6 @@ public class ExecuteScript implements Command {
 
     @Override
     public String description() {
-        return "cчитать и исполнить скрипт из указанного файла. В скрипте содержатся команды в таком же виде, в котором их вводит пользователь в интерактивном режиме.";
+        return "read and execute the script from the specified file.";
     }
 }

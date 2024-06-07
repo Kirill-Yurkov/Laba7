@@ -59,6 +59,6 @@ public class FilterLessThanType implements Command {
 
     @Override
     public String description() {
-        return "<TicketType> вывести элементы, значение поля type (VIP>USUAL>CHEAP) которых меньше заданного";
+        return "<TicketType> output elements whose value of the type (VIP>USUAL>CHEAP) field is less than the specified value";
     }
 }

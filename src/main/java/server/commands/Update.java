@@ -76,6 +76,6 @@ public class Update implements Command {
 
     @Override
     public String description() {
-        return "обновить значение элемента коллекции, id которого равен заданному";
+        return "update the value of a collection item whose ID is equal to the specified one";
     }
 }

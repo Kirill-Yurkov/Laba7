@@ -53,6 +53,6 @@ public class Show implements Command {
 
     @Override
     public String description() {
-        return "<> вывести в стандартный поток вывода все элементы коллекции в строковом представлении";
+        return "<> output all the elements of the collection in a string representation to the standard output stream";
     }
 }

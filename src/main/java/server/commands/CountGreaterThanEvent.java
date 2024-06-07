@@ -8,6 +8,7 @@ import commons.exceptions.CommandCollectionZeroException;
 import commons.exceptions.CommandValueException;
 import commons.utilities.CommandValues;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -38,17 +39,22 @@ public class CountGreaterThanEvent implements Command {
 
     @Override
     public ResponseOfCommand makeResponse(ArrayList<Object> params, int userId) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
-        if(params.get(0) instanceof Integer){
-            if (server.getListManager().getTicketListOfAll().isEmpty()) {
-                throw new CommandCollectionZeroException("collection is zero");
+        try {
+            if(params.get(0) instanceof Integer){
+                if (server.getListManager().getTicketListOfAll().isEmpty()) {
+                    throw new CommandCollectionZeroException("collection is zero");
+                }
+                int value = (int) params.get(0);
+                long count = server.getListManager().getTicketListOfAll().stream()
+                        .filter(ticket -> ticket.getEvent() != null && ticket.getEvent().getTicketsCount() > value)
+                        .count();
+                return new ResponseOfCommand(getName(), "Count events greater than " + value + " by ticket count: " + count + "\n");
             }
-            int value = (int) params.get(0);
-            long count = server.getListManager().getTicketListOfAll().stream()
-                    .filter(ticket -> ticket.getEvent() != null && ticket.getEvent().getTicketsCount() > value)
-                    .count();
-            return new ResponseOfCommand(getName(), "Count events greater than " + value + " by ticket count: " + count + "\n");
+            throw new BadRequestException("need an Integer");
+        } catch (SQLException e){
+            throw new BadRequestException("error on data base");
         }
-        throw new BadRequestException("need an Integer");
+
     }
 
     @Override
@@ -58,6 +64,6 @@ public class CountGreaterThanEvent implements Command {
 
     @Override
     public String description() {
-        return "вывести количество элементов, значение поля event(tickets count) которых больше заданного";
+        return "print the number of tickets whose event(tickets count) field value is greater than the specified one";
     }
 }

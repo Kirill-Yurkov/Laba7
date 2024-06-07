@@ -60,6 +60,6 @@ public class Help implements Command {
 
     @Override
     public String description() {
-        return "вывести справку по доступным командам";
+        return "output help for available commands";
     }
 }

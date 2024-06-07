@@ -61,6 +61,6 @@ public class Update implements Command {
 
     @Override
     public String description() {
-        return "<long (Ticket)> обновить значение элемента коллекции, id которого равен заданному";
+        return "<long (Ticket)> update the value of a collection ticket whose ID is equal to the specified one";
     }
 }

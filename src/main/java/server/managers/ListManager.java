@@ -20,7 +20,7 @@ public class ListManager {
     public ListManager(Server server) {
         this.server = server;
     }
-    public List<Ticket> getTicketListOfAll() {
+    public List<Ticket> getTicketListOfAll() throws SQLException {
         lock.lock();
         try {
             return server.getDBManager().readAllTicketsFromTable();
@@ -73,7 +73,7 @@ public class ListManager {
         }
 
     }
-    public void readTicketList() {
+    public void readTicketList() throws SQLException {
         lock.lock();
         try {
             ticketList = server.getDBManager().readDB();

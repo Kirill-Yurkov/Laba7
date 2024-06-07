@@ -10,6 +10,8 @@ import commons.exceptions.CommandCollectionZeroException;
 import commons.exceptions.CommandValueException;
 import server.managers.*;
 
+import java.sql.SQLException;
+
 /**
  * The Server class represents a server that handles commands and manages various components.
  * It provides functionality for starting and stopping the server, as well as invoking commands.
@@ -37,12 +39,12 @@ public class Server {
     @Setter
     private boolean withFile = false;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         Server server = new Server();
         Server.start(server);
     }
 
-    private static void start(Server server){
+    private static void start(Server server) throws SQLException {
         server.listManager.readTicketList();
         server.tcpServer.openConnection();
     }

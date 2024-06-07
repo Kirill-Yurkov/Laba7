@@ -10,6 +10,7 @@ import commons.patternclass.Ticket;
 import commons.patternclass.TicketType;
 import commons.utilities.CommandValues;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -43,20 +44,25 @@ public class FilterLessThanType implements Command {
 
     @Override
     public ResponseOfCommand makeResponse(ArrayList<Object> params, int userId) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
-        if(params.get(0) instanceof TicketType){
-            TicketType type = (TicketType) params.get(0);
-            StringBuilder str = new StringBuilder();
-            if(server.getListManager().getTicketListOfAll().isEmpty()){
-                throw new CommandCollectionZeroException("collection is empty");
-            }
-            for(Ticket ticket: server.getListManager().getTicketListOfAll()){
-                if(type.getPriority()<ticket.getType().getPriority()){
-                    str.append(ticket).append("\n");
+        try {
+            if(params.get(0) instanceof TicketType){
+                TicketType type = (TicketType) params.get(0);
+                StringBuilder str = new StringBuilder();
+                if(server.getListManager().getTicketListOfAll().isEmpty()){
+                    throw new CommandCollectionZeroException("collection is empty");
                 }
+                for(Ticket ticket: server.getListManager().getTicketListOfAll()){
+                    if(type.getPriority()<ticket.getType().getPriority()){
+                        str.append(ticket).append("\n");
+                    }
+                }
+                return new ResponseOfCommand(getName(), String.valueOf(str));
             }
-            return new ResponseOfCommand(getName(), String.valueOf(str));
+            throw new BadRequestException("need a TicketType");
+        } catch (SQLException e){
+            throw new BadRequestException("error on data base");
         }
-        throw new BadRequestException("need a TicketType");
+
 
     }
     @Override
@@ -66,6 +72,6 @@ public class FilterLessThanType implements Command {
 
     @Override
     public String description() {
-        return "вывести элементы, значение поля type (VIP>USUAL>CHEAP) которых меньше заданного";
+        return "output elements whose value of the type (VIP>USUAL>CHEAP) field is less than the specified value";
     }
 }

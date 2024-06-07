@@ -62,6 +62,6 @@ public class Add implements Command {
 
     @Override
     public String description() {
-        return "добавить новый элемент в коллекцию";
+        return "add a new ticket to the collection";
     }
 }

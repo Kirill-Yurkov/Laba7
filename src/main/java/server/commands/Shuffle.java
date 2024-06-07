@@ -8,6 +8,7 @@ import server.commands.interfaces.Command;
 import commons.exceptions.CommandCollectionZeroException;
 import commons.utilities.CommandValues;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 /**
@@ -44,11 +45,16 @@ public class Shuffle implements Command {
 
     @Override
     public ResponseOfCommand makeResponse(ArrayList<Object> params, int userId) throws CommandValueException, CommandCollectionZeroException, BadRequestException {
-        if(server.getListManager().getTicketListOfAll().isEmpty()){
-            throw new CommandCollectionZeroException("collection is zero");
+        try {
+            if(server.getListManager().getTicketListOfAll().isEmpty()){
+                throw new CommandCollectionZeroException("collection is zero");
+            }
+            Collections.shuffle(server.getListManager().getTicketListOfAll());
+            return new ResponseOfCommand(getName(),"successfully shuffled");
+        } catch (SQLException e){
+            throw new BadRequestException("error on data base");
         }
-        Collections.shuffle(server.getListManager().getTicketListOfAll());
-        return new ResponseOfCommand(getName(),"successfully shuffled");
+
     }
 
 
@@ -60,6 +66,6 @@ public class Shuffle implements Command {
 
     @Override
     public String description() {
-        return "перемешать элементы коллекции в случайном порядке";
+        return "shuffle the collection tickets in random order";
     }
 }

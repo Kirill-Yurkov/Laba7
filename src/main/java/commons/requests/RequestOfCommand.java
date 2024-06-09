@@ -4,15 +4,14 @@ package commons.requests;
 import commons.utilities.CommandValues;
 import lombok.Getter;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 @Getter
 public class RequestOfCommand extends Request {
-    private String name;
-    private CommandValues commandValues;
-    private ArrayList<Object> params;
-    private String login;
-    private String password;
+    private final String name;
+    private final CommandValues commandValues;
+    private final ArrayList<Object> params;
+    private final String login;
+    private final String password;
     public RequestOfCommand(String name, CommandValues commandValues, ArrayList<Object> params, String login, String password){
         this.name = name;
         this.commandValues = commandValues;

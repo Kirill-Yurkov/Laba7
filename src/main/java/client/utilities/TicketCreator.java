@@ -40,8 +40,8 @@ import java.util.Random;
 
 @Getter
 public class TicketCreator {
-    private Client client;
-    private boolean isExit = false;
+    private final Client client;
+    private final boolean isExit = false;
     public TicketCreator(Client client) {
         this.client = client;
     }

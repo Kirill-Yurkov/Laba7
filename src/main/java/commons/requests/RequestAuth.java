@@ -2,11 +2,10 @@ package commons.requests;
 
 import lombok.Getter;
 
-import java.io.Serializable;
 @Getter
 public class RequestAuth extends Request {
-    private String login;
-    private String password;
+    private final String login;
+    private final String password;
     public RequestAuth(String login, String password){
         this.login = login;
         this.password = password;

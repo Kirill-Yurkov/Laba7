@@ -17,7 +17,7 @@ import java.util.List;
 public class CommandInvoker {
     private final HashMap<String, Command> commands = new HashMap<>();
     @Getter
-    private Client client;
+    private final Client client;
 
     public CommandInvoker(Client client) {
         this.client = client;

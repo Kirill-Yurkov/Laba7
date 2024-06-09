@@ -1,8 +1,6 @@
 package server.commands;
 
 import commons.exceptions.BadRequestException;
-import commons.exceptions.BadResponseException;
-import commons.exceptions.ServerMainResponseException;
 import commons.responses.ResponseOfCommand;
 import server.Server;
 import server.commands.interfaces.Command;

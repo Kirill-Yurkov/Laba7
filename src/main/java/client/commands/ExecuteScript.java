@@ -37,7 +37,7 @@ import java.util.Set;
  */
 public class ExecuteScript implements Command {
     private Client client;
-    private static Set<String> fileSet = new HashSet<>();
+    private static final Set<String> fileSet = new HashSet<>();
 
     @Override
     public CommandValues getValue() {

@@ -5,8 +5,8 @@ import lombok.Getter;
 
 @Getter
 public class ResponseOfException extends Response {
-    private String name;
-    private Exception exception ;
+    private final String name;
+    private final Exception exception ;
     public ResponseOfException(String name, Exception exception){
         this.name = name;
         this.exception = exception;

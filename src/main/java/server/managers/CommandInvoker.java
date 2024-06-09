@@ -41,7 +41,7 @@ import java.util.List;
 public class CommandInvoker {
     private final HashMap<String, Command> commands = new HashMap<>();
     @Getter
-    private Server server;
+    private final Server server;
 
     public CommandInvoker(Server server) {
         this.server = server;

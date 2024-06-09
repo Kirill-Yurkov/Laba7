@@ -5,8 +5,8 @@ import lombok.Getter;
 
 @Getter
 public class ResponseOfCommand extends Response {
-    private String name;
-    private String answer;
+    private final String name;
+    private final String answer;
 
     public ResponseOfCommand(String name, String answer) {
         this.name = name;

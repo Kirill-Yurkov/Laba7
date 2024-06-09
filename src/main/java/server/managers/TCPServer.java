@@ -2,15 +2,20 @@ package server.managers;
 
 import commons.exceptions.AuthException;
 import commons.exceptions.BadResponseException;
+import commons.exceptions.ServerMainResponseException;
 import commons.requests.RequestAuth;
 import commons.requests.RequestOfCommand;
 import commons.responses.ResponseOfCommand;
 import commons.responses.ResponseOfException;
-import commons.exceptions.ServerMainResponseException;
 import server.Server;
 
-import java.io.*;
-import java.net.*;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
@@ -19,7 +24,7 @@ import java.util.logging.*;
 public class TCPServer {
     private static final int PORT = 7777;
     public static final Logger LOGGER = Logger.getLogger(TCPServer.class.getName());
-    private Server server;
+    private final Server server;
 
     private final ExecutorService requestPool = Executors.newFixedThreadPool(10);
     private final ForkJoinPool processingPool = new ForkJoinPool();
@@ -37,11 +42,11 @@ public class TCPServer {
         }
     }
 
-    public TCPServer(Server server){
+    public TCPServer(Server server) {
         this.server = server;
     }
 
-    public void openConnection(){
+    public void openConnection() {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             LOGGER.info("Сервер запущен и ожидает подключения на порту " + PORT);
 
@@ -61,9 +66,9 @@ public class TCPServer {
 }
 
 class ClientHandler implements Runnable {
-    private Socket clientSocket;
-    private Server server;
-    private ForkJoinPool processingPool;
+    private final Socket clientSocket;
+    private final Server server;
+    private final ForkJoinPool processingPool;
 
     public ClientHandler(Socket socket, Server server, ForkJoinPool processingPool) {
         this.clientSocket = socket;
@@ -93,17 +98,17 @@ class ClientHandler implements Runnable {
                             }
                         });
                     } else if (inputObject instanceof RequestAuth requestAuth) {
-                        processingPool.submit(() ->{
+                        processingPool.submit(() -> {
                             try {
                                 Integer id = server.getDBManager().checkAuth(requestAuth.getLogin(), requestAuth.getPassword());
                                 sendResponse(out, new ResponseOfCommand(requestAuth.getLogin(), "successfully authorized"));
                                 TCPServer.LOGGER.info(requestAuth.getLogin() + " successfully authorized by id " + id);
-                            } catch (AuthException e){
+                            } catch (AuthException e) {
                                 sendResponse(out, new ResponseOfException(requestAuth.getLogin(), e));
                                 TCPServer.LOGGER.severe("Ошибка: " + requestAuth.getLogin() + " для клиента " + clientSocket);
                             }
                         });
-                    } else{
+                    } else {
                         ResponseOfException responseOfException = new ResponseOfException("WRONG", new BadResponseException("Неверный запрос"));
                         sendResponse(out, responseOfException);
                     }
@@ -133,6 +138,7 @@ class ClientHandler implements Runnable {
             }
         }).start();
     }
+
     private void sendResponse(ObjectOutputStream out, ResponseOfException response) {
         new Thread(() -> {
             try {

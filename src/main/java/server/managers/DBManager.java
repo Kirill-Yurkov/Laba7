@@ -39,14 +39,14 @@ import java.util.logging.*;
  */
 public class DBManager {
     @Getter
-    private Server server;
+    private final Server server;
     public static final Logger LOGGER = Logger.getLogger(TCPServer.class.getName());
 
     @Getter
-    private List<String> collectionInfo = new ArrayList<>();
+    private final List<String> collectionInfo = new ArrayList<>();
 
     @Getter
-    private List<Ticket> collectionTicket = new ArrayList<>();
+    private final List<Ticket> collectionTicket = new ArrayList<>();
 
     private static final String URL = "jdbc:postgresql://localhost:5432/postgres";
     // jdbc:postgresql://localhost:5432/postgres
@@ -238,7 +238,6 @@ public class DBManager {
         return null;
     }
 
-    @NonNull
     public Long writeTicketWithoutId(Ticket ticket, int idUser) throws SQLException {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_TICKET_SQL, new String[]{"id"})) {

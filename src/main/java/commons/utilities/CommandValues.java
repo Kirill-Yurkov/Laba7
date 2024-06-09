@@ -14,5 +14,5 @@ public enum CommandValues implements Serializable {
     NOTHING,
     VALUE,
     ELEMENT,
-    VALUE_ELEMENT;
+    VALUE_ELEMENT
 }

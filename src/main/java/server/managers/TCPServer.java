@@ -4,6 +4,7 @@ import commons.exceptions.AuthException;
 import commons.exceptions.BadResponseException;
 import commons.exceptions.ServerMainResponseException;
 import commons.requests.RequestAuth;
+import commons.requests.RequestAuthOfNotAuthorized;
 import commons.requests.RequestOfCommand;
 import commons.responses.ResponseOfCommand;
 import commons.responses.ResponseOfException;
@@ -22,7 +23,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.logging.*;
 
 public class TCPServer {
-    private static final int PORT = 7777;
+    private static final int PORT = 6666;
     public static final Logger LOGGER = Logger.getLogger(TCPServer.class.getName());
     private final Server server;
 
@@ -106,6 +107,17 @@ class ClientHandler implements Runnable {
                             } catch (AuthException e) {
                                 sendResponse(out, new ResponseOfException(requestAuth.getLogin(), e));
                                 TCPServer.LOGGER.severe("Ошибка: " + requestAuth.getLogin() + " для клиента " + clientSocket);
+                            }
+                        });
+                    } else if (inputObject instanceof RequestAuthOfNotAuthorized requestAuthOfNotAuthorized) {
+                        processingPool.submit(() -> {
+                            try {
+                                Integer id = server.getDBManager().checkAuthForNotAuthorized(requestAuthOfNotAuthorized.getLogin(), requestAuthOfNotAuthorized.getPassword());
+                                sendResponse(out, new ResponseOfCommand(requestAuthOfNotAuthorized.getLogin(), "successfully authorized"));
+                                TCPServer.LOGGER.info(requestAuthOfNotAuthorized.getLogin() + " successfully authorized by id " + id);
+                            } catch (AuthException e) {
+                                sendResponse(out, new ResponseOfException(requestAuthOfNotAuthorized.getLogin(), e));
+                                TCPServer.LOGGER.severe("Ошибка: " + requestAuthOfNotAuthorized.getLogin() + " для клиента " + clientSocket);
                             }
                         });
                     } else {

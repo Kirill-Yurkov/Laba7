@@ -4,11 +4,10 @@ import client.managers.CommandInvoker;
 import client.managers.InputOutput;
 import client.managers.TCPClient;
 import client.utilities.TicketCreator;
-import commons.exceptions.BadResponseException;
-import commons.exceptions.CommandCollectionZeroException;
-import commons.exceptions.CommandValueException;
-import commons.exceptions.ServerMainResponseException;
+import commons.exceptions.*;
 import commons.requests.RequestAuth;
+import commons.requests.RequestAuthOfNotAuthorized;
+import commons.utilities.Validator;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -53,12 +52,52 @@ public class Client {
         if(!tcpClient.openConnection()){
             return;
         }
-        do{
-            inputOutput.outPut("Enter your username: \n~ ");
-            login = inputOutput.inPutConsole().strip();
-            inputOutput.outPut("Enter your password: \n~ ");
-            password = inputOutput.inPutConsole().strip();
-        }while (!auth(login, password));
+        if(isRegistered()){
+            do{
+                inputOutput.outPut("Enter your username: \n~ ");
+                login = inputOutput.inPutConsole().strip();
+                if (login.equals("exit")){
+                    stop();
+                }
+                inputOutput.outPut("Enter your password: \n~ ");
+                password = inputOutput.inPutConsole().strip();
+                if (password.equals("exit")){
+                    stop();
+                }
+            }while (!auth(login, password));
+        }else{
+            do{
+                inputOutput.outPut("Enter your username: \n~ ");
+                login = inputOutput.inPutConsole().strip();
+                if (login.equals("exit")){
+                    stop();
+                }
+                inputOutput.outPut("Enter your password: \n~ ");
+                password = inputOutput.inPutConsole().strip();
+                if (password.equals("exit")){
+                    stop();
+                }
+            }while (!authOfNotAuthorized(login, password));
+        }
+    }
+    private boolean isRegistered() {
+        inputOutput.outPut("Are you already registered? (yes/no)\n~ ");
+        String str = inputOutput.inPutConsole().strip().toLowerCase();
+        if (str.equals("exit")){
+            stop();
+            return false;
+        }
+        switch (str) {
+            case "yes" -> {
+                return true;
+            }
+            case "no" -> {
+                return false;
+            }
+            default -> {
+                return isRegistered();
+            }
+        }
     }
     private boolean auth(String login, String password){
         try {
@@ -67,6 +106,20 @@ public class Client {
                 return false;
             }
             tcpClient.getAnswer(new RequestAuth(login, password));
+            inputOutput.outPut(tcpClient.getAnswer(new RequestAuth(login, password)) + " \n");
+            return true;
+        } catch (BadResponseException e) {
+            inputOutput.outPut("Problem: " + e.getMessage() + " \n");
+            return false;
+        }
+    }
+    private boolean authOfNotAuthorized(String login, String password){
+        try {
+            if (login.isBlank() || password.isBlank()){
+                inputOutput.outPut("Remove the empty lines from the auth \n");
+                return false;
+            }
+            tcpClient.getAnswer(new RequestAuthOfNotAuthorized(login, password));
             inputOutput.outPut(tcpClient.getAnswer(new RequestAuth(login, password)) + " \n");
             return true;
         } catch (BadResponseException e) {

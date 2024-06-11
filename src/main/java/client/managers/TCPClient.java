@@ -55,7 +55,7 @@ public class TCPClient {
         int attempts = 0;
         while (attempts < MAX_CONNECTION_ATTEMPTS) {
             try {
-                socket = new Socket("localhost", 7777);
+                socket = new Socket("localhost", 6666);
                 inPort = new ObjectInputStream(socket.getInputStream());
                 outPort = new ObjectOutputStream(socket.getOutputStream());
                 LOGGER.info("The connection to the server has been completed. "+socket);

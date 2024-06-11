@@ -17,26 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.*;
 
-/**
- * The DBManager class is responsible for managing file operations in the server.
- * It provides functionality for setting the file path, initializing the file, and reading/writing XML files.
- * The DBManager class is used by the Server class to handle file-related tasks.
- * <p>
- * Usage:
- * DBManager fileManager = new DBManager(server);
- * fileManager.setFilePath(filePath); // Set the file path
- * fileManager.initializeFile(); // Initialize the file
- * fileManager.readXML(); // Read the XML file
- * fileManager.writeXML(filePath, tickets); // Write the XML file
- * <p>
- * Example:
- * DBManager fileManager = new DBManager(server);
- * fileManager.setFilePath(filePath);
- * fileManager.initializeFile();
- * fileManager.readXML();
- * fileManager.writeXML(filePath, tickets);
- * ITErator iterable
- */
 public class DBManager {
     @Getter
     private final Server server;
@@ -48,13 +28,13 @@ public class DBManager {
     @Getter
     private final List<Ticket> collectionTicket = new ArrayList<>();
 
-    private static final String URL = "jdbc:postgresql://localhost:5432/postgres";
+    private static final String URL = "jdbc:postgresql://pg:5432/studs";
     // jdbc:postgresql://localhost:5432/postgres
     // jdbc:postgresql://pg:5432/studs
-    private static final String USER = "postgres";
+    private static final String USER = "s409936";
     // postgres
     // s409936
-    private static final String PASSWORD = "123";
+    private static final String PASSWORD = "fVbN4A91DGSYl7CG";
     // 123
     // fVbN4A91DGSYl7CG
 
@@ -62,13 +42,6 @@ public class DBManager {
         try {
             LogManager.getLogManager().reset();
             LOGGER.setLevel(Level.ALL);
-
-            /*
-            ConsoleHandler consoleHandler = new ConsoleHandler();
-            consoleHandler.setLevel(Level.ALL);
-            LOGGER.addHandler(consoleHandler);
-            */
-
             FileHandler fileHandler = new FileHandler("server.log", true);
             fileHandler.setLevel(Level.ALL);
             fileHandler.setFormatter(new SimpleFormatter());
@@ -216,7 +189,6 @@ public class DBManager {
     public Event readEventFromTableById(int eventId) throws SQLException {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement preparedStatement = connection.prepareStatement(SELECT_EVENT_BY_ID)) {
-
             preparedStatement.setInt(1, eventId);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
@@ -383,6 +355,24 @@ public class DBManager {
                     } else {
                         throw new AuthException("incorrect password");
                     }
+                }
+            }
+            throw new AuthException("incorrect login");
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE,"Error occurred while checking auth: " + e.getMessage(), e);
+            return null;
+        }
+    }
+    public Integer checkAuthForNotAuthorized(String login, String password) throws AuthException {
+        if(login.isBlank()||password.isBlank()){
+            throw new AuthException("empty strings");
+        }
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_USERS);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+            while (resultSet.next()) {
+                if (login.equals(resultSet.getString("login"))) {
+                    throw new AuthException("this login is already taken.");
                 }
             }
             return writeUserWithoutId(login, password);

@@ -67,12 +67,12 @@ public class Client {
             }while (!auth(login, password));
         }else{
             do{
-                inputOutput.outPut("Enter your username: \n~ ");
+                inputOutput.outPut("Enter your username for registration: \n~ ");
                 login = inputOutput.inPutConsole().strip();
                 if (login.equals("exit")){
                     stop();
                 }
-                inputOutput.outPut("Enter your password: \n~ ");
+                inputOutput.outPut("Enter your password for registration: \n~ ");
                 password = inputOutput.inPutConsole().strip();
                 if (password.equals("exit")){
                     stop();
@@ -103,27 +103,33 @@ public class Client {
         try {
             if (login.isBlank() || password.isBlank()){
                 inputOutput.outPut("Remove the empty lines from the auth \n");
+                inputOutput.outPut("\n");
                 return false;
             }
             tcpClient.getAnswer(new RequestAuth(login, password));
             inputOutput.outPut(tcpClient.getAnswer(new RequestAuth(login, password)) + " \n");
+            inputOutput.outPut("\n");
             return true;
         } catch (BadResponseException e) {
             inputOutput.outPut("Problem: " + e.getMessage() + " \n");
+            inputOutput.outPut("\n");
             return false;
         }
     }
     private boolean authOfNotAuthorized(String login, String password){
         try {
             if (login.isBlank() || password.isBlank()){
+                inputOutput.outPut("\n");
                 inputOutput.outPut("Remove the empty lines from the auth \n");
                 return false;
             }
             tcpClient.getAnswer(new RequestAuthOfNotAuthorized(login, password));
             inputOutput.outPut(tcpClient.getAnswer(new RequestAuth(login, password)) + " \n");
+            inputOutput.outPut("\n");
             return true;
         } catch (BadResponseException e) {
             inputOutput.outPut("Problem: " + e.getMessage() + " \n");
+            inputOutput.outPut("\n");
             return false;
         }
     }

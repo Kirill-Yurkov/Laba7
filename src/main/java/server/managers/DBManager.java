@@ -28,13 +28,13 @@ public class DBManager {
     @Getter
     private final List<Ticket> collectionTicket = new ArrayList<>();
 
-    private static final String URL = "jdbc:postgresql://pg:5432/studs";
+    private static final String URL = "jdbc:postgresql://localhost:5432/postgres";
     // jdbc:postgresql://localhost:5432/postgres
     // jdbc:postgresql://pg:5432/studs
-    private static final String USER = "s409936";
+    private static final String USER = "postgres";
     // postgres
     // s409936
-    private static final String PASSWORD = "fVbN4A91DGSYl7CG";
+    private static final String PASSWORD = "123";
     // 123
     // fVbN4A91DGSYl7CG
 
